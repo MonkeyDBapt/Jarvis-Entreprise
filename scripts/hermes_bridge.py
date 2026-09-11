@@ -11,12 +11,22 @@ from run_agent import AIAgent
 
 def main() -> int:
     request = json.load(sys.stdin)
-    agent = AIAgent(
-        model=request.get("model", ""),
-        quiet_mode=True,
-        session_id=request.get("session_id"),
-        max_iterations=request.get("max_iterations", 20),
-    )
+    from hermes_cli.config import load_config_readonly
+
+    config = load_config_readonly()
+    model_config = config.get("model", {}) or {}
+
+    agent_kwargs = {
+        "quiet_mode": True,
+        "session_id": request.get("session_id"),
+        "max_iterations": request.get("max_iterations", 20),
+        "model": request.get("model") or model_config.get("default", ""),
+        "provider": model_config.get("provider"),
+        "base_url": model_config.get("base_url"),
+        "api_mode": model_config.get("api_mode"),
+    }
+
+    agent = AIAgent(**agent_kwargs)
     result = agent.run_conversation(
         user_message=request["message"],
         task_id=request.get("task_id"),
