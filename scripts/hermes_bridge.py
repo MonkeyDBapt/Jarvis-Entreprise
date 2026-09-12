@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import sys
 
@@ -27,10 +28,11 @@ def main() -> int:
     }
 
     agent = AIAgent(**agent_kwargs)
-    result = agent.run_conversation(
-        user_message=request["message"],
-        task_id=request.get("task_id"),
-    )
+    with contextlib.redirect_stdout(sys.stderr):
+        result = agent.run_conversation(
+            user_message=request["message"],
+            task_id=request.get("task_id"),
+        )
     json.dump(
         {
             "final_response": result.get("final_response", ""),
