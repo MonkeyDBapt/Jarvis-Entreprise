@@ -7,7 +7,8 @@ from dataclasses import dataclass
 
 from agent_framework import Executor, WorkflowBuilder, WorkflowContext, handler
 
-from jarvis.runtime.hermes_adapter import HermesAdapter
+from jarvis.interfaces import AgentRuntime
+from jarvis.runtime import HermesAdapter
 
 
 @dataclass(frozen=True)
@@ -23,11 +24,11 @@ class OrchestrationRequest:
 
 
 class HermesExecutor(Executor):
-    """MAF executor that delegates agent execution to the Hermes adapter."""
+    """MAF executor that delegates agent execution to a JARVIS runtime interface."""
 
-    def __init__(self, hermes: HermesAdapter | None = None, *, id: str = "hermes") -> None:
+    def __init__(self, runtime: AgentRuntime | None = None, *, id: str = "hermes") -> None:
         super().__init__(id=id)
-        self.hermes = hermes or HermesAdapter()
+        self.runtime = runtime or HermesAdapter()
 
     @handler
     async def execute_request(
@@ -36,7 +37,7 @@ class HermesExecutor(Executor):
         ctx: WorkflowContext[str],
     ) -> None:
         response = await asyncio.to_thread(
-            self.hermes.chat,
+            self.runtime.chat,
             request.message,
             model=request.model,
             session_id=request.session_id,
@@ -50,12 +51,9 @@ class HermesExecutor(Executor):
 class JarvisOrchestrator:
     """Public JARVIS orchestration entry point backed by Microsoft Agent Framework."""
 
-    def __init__(self, hermes: HermesAdapter | None = None) -> None:
-        self.hermes_executor = HermesExecutor(hermes)
-        self.workflow = (
-            WorkflowBuilder(start_executor=self.hermes_executor)
-            .build()
-        )
+    def __init__(self, runtime: AgentRuntime | None = None) -> None:
+        self.hermes_executor = HermesExecutor(runtime)
+        self.workflow = WorkflowBuilder(start_executor=self.hermes_executor).build()
 
     async def run(self, request: OrchestrationRequest) -> str:
         """Execute one request through the MAF workflow and return its final output."""
