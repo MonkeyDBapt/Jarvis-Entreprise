@@ -11,7 +11,10 @@ class Agent:
 
     id: str
     name: str
+    role: str = ""
     description: str = ""
+    capabilities: list[str] = field(default_factory=list)
+    configuration: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass
