@@ -60,3 +60,27 @@ The model does **not** contain runtime status, lifecycle methods, routing, permi
 ### Compatibility
 
 `role`, `capabilities`, and `configuration` have defaults so the existing Phase 3.1 organizational hierarchy remains valid without forcing premature detail into existing callers.
+
+## 3.3 — Registre des agents
+
+### Decision
+
+The agent registry is a JARVIS-owned domain service that indexes declarative `Agent` definitions by their stable identifier. It is deliberately independent from runtime execution and from the organizational hierarchy's parent/child collections.
+
+### Registry contract
+
+`AgentRegistry` provides:
+
+- `register(agent)`: register an agent by stable `id`;
+- `get(agent_id)`: retrieve a registered agent;
+- `contains(agent_id)`: check whether an identifier is registered;
+- `list_agents()`: list registered agents in registration order;
+- `unregister(agent_id)`: remove and return an agent.
+
+Agent identifiers are unique within the registry. Registering an existing identifier raises `ValueError`; retrieving or removing an unknown identifier raises `KeyError`.
+
+### Responsibility boundary
+
+The registry is an index, not an execution manager. It does **not** start or stop agents, invoke runtimes, perform routing, grant permissions, apply governance, manage messaging/events, or implement specialized agent logic.
+
+This keeps the separation established in Phase 2 and 3.2: the declarative agent definition remains independent from `AgentRuntime`, MAF, Hermes, and future runtime implementations.
