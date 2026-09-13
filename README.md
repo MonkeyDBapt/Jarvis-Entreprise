@@ -57,7 +57,15 @@ The detailed consolidation record is available in [`docs/phase-2-socle.md`](docs
 
 Current Phase 2 scope is intentionally minimal: MAF provides the orchestration boundary and workflow execution path, while Hermes provides the current operational runtime. Hierarchical multi-agent routing, governance, messaging/event infrastructure, higher-level interfaces, and additional specialized capabilities remain subsequent work.
 
-The repository includes unit tests for request routing and a GitHub Actions validation workflow. A successful CI run validates package installation and MAF API imports/tests; a model-backed Hermes run still requires the local Hermes runtime and provider credentials.
+### Phase 3 status
+
+**3.1 — Modèle d'organisation: validée.**  
+**3.2 — Modèle Agent: validée.**  
+**3.3 — Registre des agents: validée.**
+
+The agent registry is a JARVIS-owned index of declarative agent definitions. It provides stable-ID registration, lookup, presence checks, ordered listing, and removal while remaining independent from runtime execution, routing, permissions, governance, and messaging.
+
+The repository includes unit tests for the organization hierarchy, agent model, registry, runtime interface, and MAF routing. GitHub Actions validates the package and test suite across Python 3.10, 3.11, 3.12, and 3.13.
 
 Run the local test suite with:
 
