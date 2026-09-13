@@ -84,3 +84,11 @@ Agent identifiers are unique within the registry. Registering an existing identi
 The registry is an index, not an execution manager. It does **not** start or stop agents, invoke runtimes, perform routing, grant permissions, apply governance, manage messaging/events, or implement specialized agent logic.
 
 This keeps the separation established in Phase 2 and 3.2: the declarative agent definition remains independent from `AgentRuntime`, MAF, Hermes, and future runtime implementations.
+
+### Validation
+
+3.3 is validated by the GitHub Actions `Validation` workflow on commit `d4bbb36f7fcbf752e9e7d347bf8f3e6c6fdd105c`.
+
+The workflow passed on Python 3.10, 3.11, 3.12, and 3.13. The suite ran 11 tests successfully, including the five dedicated `AgentRegistry` tests covering registration, lookup, duplicate rejection, ordering, removal, and unknown identifiers.
+
+**3.3 — Registre des agents: VALIDÉE.**
