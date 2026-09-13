@@ -23,11 +23,41 @@ After setup, API/provider credentials must be configured according to Hermes' ow
 ### Microsoft Agent Framework
 
 The JARVIS orchestration boundary is implemented with `agent-framework-core==1.18.0`.
-`JarvisOrchestrator` builds a Microsoft Agent Framework workflow whose `HermesExecutor` delegates execution to the isolated `HermesAdapter`.
+`JarvisOrchestrator` builds a Microsoft Agent Framework workflow whose `HermesExecutor` delegates execution to the isolated `HermesAdapter` through the JARVIS `AgentRuntime` contract.
 
-Current Phase 2 scope is intentionally minimal: MAF provides the orchestration boundary and workflow execution path; hierarchical multi-agent routing, governance, messaging/event infrastructure, and higher-level interfaces remain subsequent Phase 2 work.
+### Phase 2 status
 
-The repository includes unit tests for request routing and a GitHub Actions test workflow. A successful CI run validates the package installation and MAF API imports/tests; a model-backed Hermes run still requires the local Hermes runtime and provider credentials.
+**Phase 2 — Socle technique: clôturée.**
+
+The consolidated reference architecture is:
+
+```text
+JARVIS Enterprise
+       │
+       ▼
+JarvisOrchestrator
+       │
+       ▼
+Microsoft Agent Framework
+       │
+       ▼
+AgentRuntime
+       │
+       ▼
+HermesAdapter
+       │
+       ▼
+Hermes
+       │
+       ▼
+LLM
+```
+
+The detailed consolidation record is available in [`docs/phase-2-socle.md`](docs/phase-2-socle.md).
+
+Current Phase 2 scope is intentionally minimal: MAF provides the orchestration boundary and workflow execution path, while Hermes provides the current operational runtime. Hierarchical multi-agent routing, governance, messaging/event infrastructure, higher-level interfaces, and additional specialized capabilities remain subsequent work.
+
+The repository includes unit tests for request routing and a GitHub Actions validation workflow. A successful CI run validates package installation and MAF API imports/tests; a model-backed Hermes run still requires the local Hermes runtime and provider credentials.
 
 Run the local test suite with:
 
