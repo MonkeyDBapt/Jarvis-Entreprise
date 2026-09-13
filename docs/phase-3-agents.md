@@ -30,4 +30,33 @@ The domain model provides:
 - explicit parent/child collections;
 - duplicate identifier protection within each parent scope.
 
-The model deliberately does not yet define routing, permissions, governance policies, messaging/events, or specialized agent capabilities. Those concerns remain subsequent Phase 3 work unless a later validated decision changes the scope.
+## 3.2 — Modèle Agent
+
+### Decision
+
+The `Agent` model is kept declarative and deliberately separated from execution.
+
+Three possible levels were considered:
+
+1. **Minimal identity only** — `id`, `name`, `description`.
+2. **Declarative operational definition** — identity plus role, capabilities, and configuration.
+3. **Runtime-coupled model** — add lifecycle/status and execution methods directly to the agent.
+
+Option **2** is retained because it gives JARVIS enough information to describe and configure an agent without coupling the organizational model to Hermes or another runtime. Option 3 is rejected at this stage because it would mix responsibilities already separated in the Phase 2 architecture.
+
+### Agent contract
+
+An `Agent` contains:
+
+- `id`: stable identifier;
+- `name`: human-readable name;
+- `role`: organizational/function role;
+- `description`: optional human-readable description;
+- `capabilities`: declared capabilities, represented as names for now;
+- `configuration`: declarative agent configuration, kept generic for future evolution.
+
+The model does **not** contain runtime status, lifecycle methods, routing, permissions, governance, messaging/events, memory implementation, or specialized business logic. Those concerns remain separate and can be connected by later Phase 3 steps.
+
+### Compatibility
+
+`role`, `capabilities`, and `configuration` have defaults so the existing Phase 3.1 organizational hierarchy remains valid without forcing premature detail into existing callers.
