@@ -18,6 +18,30 @@ class OrganizationModelTests(unittest.TestCase):
         self.assertIs(pole.teams[0], team)
         self.assertIs(team.agents[0], agent)
 
+    def test_agent_model_contains_declarative_properties(self) -> None:
+        agent = Agent(
+            "hermes",
+            "Hermes",
+            role="orchestrateur",
+            description="Agent chargé de l'orchestration.",
+            capabilities=["orchestration", "communication"],
+            configuration={"runtime": "hermes"},
+        )
+
+        self.assertEqual(agent.id, "hermes")
+        self.assertEqual(agent.name, "Hermes")
+        self.assertEqual(agent.role, "orchestrateur")
+        self.assertEqual(agent.description, "Agent chargé de l'orchestration.")
+        self.assertEqual(agent.capabilities, ["orchestration", "communication"])
+        self.assertEqual(agent.configuration, {"runtime": "hermes"})
+
+    def test_agent_definition_is_independent_from_runtime(self) -> None:
+        agent = Agent("hermes", "Hermes", role="orchestrateur")
+
+        self.assertFalse(hasattr(agent, "status"))
+        self.assertFalse(hasattr(agent, "start"))
+        self.assertFalse(hasattr(agent, "stop"))
+
     def test_duplicate_ids_are_rejected_at_each_level(self) -> None:
         organization = Organization("jarvis", "JARVIS Enterprise")
         organization.add_pole(Pole("operations", "Opérations"))
