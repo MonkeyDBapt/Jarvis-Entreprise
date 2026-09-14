@@ -29,6 +29,11 @@ class MemoryLifecycleTests(unittest.TestCase):
 
     def test_archive_and_restore(self) -> None:
         self.assertEqual(self.lifecycle.get_state("m2"), MemoryLifecycleState.ARCHIVED)
+        retriever = SQLiteMemoryRetriever(self.path)
+        try:
+            self.assertEqual(retriever.search("JARVIS mémoire archive"), [])
+        finally:
+            retriever.close()
         self.lifecycle.restore("m2")
         self.assertEqual(self.lifecycle.get_state("m2"), MemoryLifecycleState.ACTIVE)
 
