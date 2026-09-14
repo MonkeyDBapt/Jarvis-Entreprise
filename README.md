@@ -113,7 +113,7 @@ Permissions, advanced governance, messaging/events, specialized memory, and spec
 | 4.1 — Modèle de capacité | ✅ Validée |
 | 4.2 — Registre des capacités | ✅ Validée |
 | 4.3 — Affectation capacités / agents | ✅ Validée |
-| 4.4 — Exécution des capacités | ✅ Implémentée / validation CI à confirmer |
+| 4.4 — Exécution des capacités | ✅ **Validée** |
 
 The Phase 4 capability architecture is:
 
