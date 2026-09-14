@@ -7,6 +7,7 @@ from .capability import Capability
 from .capability_assignment import CapabilityAssignmentManager
 from .capability_execution import CapabilityExecutor, CapabilityHandler
 from .capability_registry import CapabilityRegistry
+from .memory import Memory, MemoryType
 from .organization import Agent, Organization, Pole, Team
 from .organization_manager import OrganizationManager
 from .security import SecurityController, SecurityControlledExecutor, SecurityRule
@@ -25,6 +26,8 @@ __all__ = [
     "CapabilityExecutor",
     "CapabilityHandler",
     "CapabilityRegistry",
+    "Memory",
+    "MemoryType",
     "Organization",
     "OrganizationManager",
     "Pole",
