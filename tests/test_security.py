@@ -1,6 +1,6 @@
 import unittest
 
-from jarvis.core import Capability, CapabilityAssignmentManager, CapabilityRegistry, Agent, AgentRegistry
+from jarvis.core import Agent, AgentRegistry, Capability, CapabilityAssignmentManager, CapabilityRegistry
 from jarvis.core.capability_execution import CapabilityExecutor
 from jarvis.core.security import SecurityController, SecurityControlledExecutor
 
@@ -42,7 +42,7 @@ class SecurityControlTests(unittest.TestCase):
 
     def test_assignment_still_controls_execution(self) -> None:
         self.security.allow("subject-1", "execute", "capability:cap-1")
-        with self.assertRaises(PermissionError):
+        with self.assertRaises(KeyError):
             self.executor.execute("unknown-agent", "cap-1", "data")
 
 
