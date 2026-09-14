@@ -186,10 +186,13 @@ Phase 5.8 validates and consolidates the complete memory architecture. The memor
 | 6.1 — Modèle d’intelligence | ✅ Validée |
 | 6.2 — Registre des modèles | ✅ **Validée** |
 | 6.3 — Configuration | ✅ **Validée** |
+| 6.4 — Sélection / routage | ✅ **Validée** |
 
-Phase 6.1 defines the provider-independent declarative `Model`, `ModelType`, and `ModelCapability` contracts. Phase 6.2 adds `ModelRegistry`, which centrally registers models by stable identifier, rejects duplicates, supports lookup and removal, and exposes a deterministic immutable registration view. Phase 6.3 adds the immutable provider-neutral `ModelConfiguration` boundary for endpoints, parameters, context/output limits, operational limits, secret references, and provider-specific configuration. Secrets themselves are never stored in the model configuration or committed to Git. Model selection/routing, provider adapters, execution, and intelligence strategies remain outside 6.3 and are reserved for later Phase 6 steps.
+Phase 6.1 defines the provider-independent declarative `Model`, `ModelType`, and `ModelCapability` contracts. Phase 6.2 adds `ModelRegistry`, which centrally registers models by stable identifier, rejects duplicates, supports lookup and removal, and exposes a deterministic immutable registration view. Phase 6.3 adds the immutable provider-neutral `ModelConfiguration` boundary for endpoints, parameters, context/output limits, operational limits, secret references, and provider-specific configuration. Secrets themselves are never stored in the model configuration or committed to Git.
 
-The detailed consolidation records are available in [`docs/phase-6-2-model-registry.md`](docs/phase-6-2-model-registry.md) and [`docs/phase-6-3-configuration.md`](docs/phase-6-3-configuration.md).
+Phase 6.4 adds the provider-neutral `ModelSelectionRequest`, `ModelSelectionResult`, and `ModelRouter` contracts. Selection is deterministic: an explicit model id takes precedence, then requested capabilities, model type, provider, and registration order as a stable tie-breaker. Routing performs no provider execution or secret resolution; those concerns remain outside this step.
+
+The detailed consolidation records are available in [`docs/phase-6-2-model-registry.md`](docs/phase-6-2-model-registry.md), [`docs/phase-6-3-configuration.md`](docs/phase-6-3-configuration.md), and [`docs/phase-6-4-selection-routage.md`](docs/phase-6-4-selection-routage.md).
 
 ## Tests
 
