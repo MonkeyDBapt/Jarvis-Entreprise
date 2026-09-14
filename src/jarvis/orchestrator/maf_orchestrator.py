@@ -23,7 +23,6 @@ from jarvis.core import (
 )
 from jarvis.interfaces import AgentRuntime
 from jarvis.interfaces.memory_context import MemoryContextInjector
-from jarvis.memory import RetrieverMemoryContextInjector, SQLiteMemoryRetriever
 from jarvis.runtime import HermesAdapter
 
 
