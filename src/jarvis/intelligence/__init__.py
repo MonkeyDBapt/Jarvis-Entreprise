@@ -4,6 +4,7 @@ from .configuration import ModelConfiguration
 from .model import Model, ModelCapability, ModelType
 from .registry import ModelRegistry
 from .routing import ModelRouter, ModelSelectionRequest, ModelSelectionResult
+from .strategy import ModelUsageRequest, ModelUsageStrategy
 
 __all__ = [
     "Model",
@@ -14,4 +15,6 @@ __all__ = [
     "ModelSelectionRequest",
     "ModelSelectionResult",
     "ModelType",
+    "ModelUsageRequest",
+    "ModelUsageStrategy",
 ]
