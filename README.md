@@ -159,7 +159,7 @@ The detailed Phase 4 consolidation record is available in [`docs/phase-4-8-valid
 | 5.3 — Stockage | ✅ **Validée** |
 | 5.4 — Recherche / récupération | ✅ **Validée** |
 | 5.5 — Contexte / injection | ✅ **Validée** |
-| 5.6 — Contrôle / cycle de vie | ⏳ À venir |
+| 5.6 — Contrôle / cycle de vie | ✅ **Validée** |
 | 5.7 — Intégration orchestrateur | ⏳ À venir |
 | 5.8 — Validation / consolidation | ⏳ À venir |
 
@@ -171,9 +171,12 @@ Phase 5.4 adds the `MemoryRetriever` contract and the initial `SQLiteMemoryRetri
 
 Phase 5.5 adds the `MemoryContextInjector` contract and the initial `RetrieverMemoryContextInjector`. It converts retrieved memories into bounded, deterministic prompt-ready context without coupling memory to MAF, Hermes, or the orchestrator. The injector preserves retrieval order and excludes a memory when it would exceed the configured character budget.
 
+Phase 5.6 adds the `MemoryLifecycle` contract and `MemoryLifecycleManager`. Memories support explicit `active`, `archived`, and `expired` lifecycle states, optional ISO-8601 expiration metadata, restoration, permanent deletion, and explicit purge. Retrieval now excludes archived and expired memories, while legacy memories without lifecycle metadata remain active by default.
+
 The detailed Phase 5.3 decision record is available in [`docs/phase-5-3-stockage.md`](docs/phase-5-3-stockage.md).
 The detailed Phase 5.4 decision record is available in [`docs/phase-5-4-recherche-recuperation.md`](docs/phase-5-4-recherche-recuperation.md).
 The detailed Phase 5.5 decision record is available in [`docs/phase-5-5-contexte-injection.md`](docs/phase-5-5-contexte-injection.md).
+The detailed Phase 5.6 decision record is available in [`docs/phase-5-6-controle-cycle-vie.md`](docs/phase-5-6-controle-cycle-vie.md).
 
 ## Tests
 
