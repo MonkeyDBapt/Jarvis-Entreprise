@@ -157,7 +157,7 @@ The detailed Phase 4 consolidation record is available in [`docs/phase-4-8-valid
 | 5.1 — Modèle de mémoire | ✅ Validée |
 | 5.2 — Types / catégories | ✅ **Validée** |
 | 5.3 — Stockage | ✅ **Validée** |
-| 5.4 — Recherche / récupération | ⏳ À venir |
+| 5.4 — Recherche / récupération | ✅ **Validée** |
 | 5.5 — Contexte / injection | ⏳ À venir |
 | 5.6 — Contrôle / cycle de vie | ⏳ À venir |
 | 5.7 — Intégration orchestrateur | ⏳ À venir |
@@ -167,7 +167,10 @@ Phase 5.2 distinguishes the five functional memory forms `working`, `episodic`, 
 
 Phase 5.3 adds the `MemoryStore` persistence contract and the initial `SQLiteMemoryStore` backend. Memory data is persisted locally under `.data/memory.sqlite3`, which is excluded from Git. Storage remains independent from retrieval, ranking, expiration, embeddings, context injection, and orchestration integration.
 
+Phase 5.4 adds the `MemoryRetriever` contract and the initial `SQLiteMemoryRetriever`. Retrieval is currently lexical, local, deterministic, case-insensitive, filterable by memory type/scope, and limited by result count. Embeddings, vector search, reranking, context injection, lifecycle and orchestration integration remain outside this step.
+
 The detailed Phase 5.3 decision record is available in [`docs/phase-5-3-stockage.md`](docs/phase-5-3-stockage.md).
+The detailed Phase 5.4 decision record is available in [`docs/phase-5-4-recherche-recuperation.md`](docs/phase-5-4-recherche-recuperation.md).
 
 ## Tests
 
