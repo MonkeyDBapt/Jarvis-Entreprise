@@ -9,12 +9,7 @@ from typing import Mapping
 
 @dataclass(frozen=True)
 class ModelConfiguration:
-    """Immutable configuration boundary between a model and its provider/runtime.
-
-    Provider credentials are represented only by secret references. Secret values
-    must be supplied by the runtime environment and must never be stored here or
-    committed to Git.
-    """
+    """Immutable configuration boundary between a model and its provider/runtime."""
 
     endpoint: str | None = None
     parameters: Mapping[str, object] = field(default_factory=dict)
@@ -39,6 +34,27 @@ class ModelConfiguration:
         object.__setattr__(self, "limits", MappingProxyType(dict(self.limits)))
         object.__setattr__(self, "secret_refs", MappingProxyType(dict(self.secret_refs)))
         object.__setattr__(self, "provider_configuration", MappingProxyType(dict(self.provider_configuration)))
+
+    def __getitem__(self, key: str) -> object:
+        """Provide read-only mapping-style access for legacy model configurations."""
+        if key == "endpoint":
+            return self.endpoint
+        if key == "temperature":
+            return self.temperature
+        if key == "context_limit":
+            return self.context_limit
+        if key == "output_limit":
+            return self.output_limit
+        if key in self.parameters:
+            return self.parameters[key]
+        raise KeyError(key)
+
+    def get(self, key: str, default: object = None) -> object:
+        """Return a configuration value without allowing mutation."""
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
 
 __all__ = ["ModelConfiguration"]
