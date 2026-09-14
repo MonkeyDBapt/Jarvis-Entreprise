@@ -2,5 +2,13 @@
 
 from .agent_registry import AgentRegistry
 from .organization import Agent, Organization, Pole, Team
+from .organization_manager import OrganizationManager
 
-__all__ = ["Agent", "AgentRegistry", "Organization", "Pole", "Team"]
+__all__ = [
+    "Agent",
+    "AgentRegistry",
+    "Organization",
+    "OrganizationManager",
+    "Pole",
+    "Team",
+]
