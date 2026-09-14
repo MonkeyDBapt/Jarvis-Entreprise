@@ -6,6 +6,15 @@ import asyncio
 import unittest
 
 from jarvis.core import Agent
+from jarvis.intelligence import (
+    Model,
+    ModelCapability,
+    ModelControlConstraints,
+    ModelRegistry,
+    ModelType,
+    ModelUsageRequest,
+    ModelUsageStrategy,
+)
 from jarvis.orchestrator import JarvisOrchestrator, OrchestrationRequest
 
 
@@ -57,6 +66,61 @@ class MafOrchestratorTests(unittest.TestCase):
         asyncio.run(orchestrator.run(request))
 
         self.assertEqual(hermes.calls[0]["model"], "agent-model")
+
+    def test_model_intelligence_is_resolved_before_maf_execution(self) -> None:
+        hermes = FakeHermes()
+        models = ModelRegistry()
+        models.register(
+            Model(
+                id="quality-model",
+                name="Quality model",
+                provider="test-provider",
+                model_id="provider-quality-v1",
+                model_type=ModelType.LLM,
+                capabilities=(ModelCapability.TEXT_GENERATION,),
+            )
+        )
+        orchestrator = JarvisOrchestrator(hermes, model_registry=models)  # type: ignore[arg-type]
+        orchestrator.register_agent(Agent(id="agent-1", name="Test Agent", role="test"))
+        orchestrator.lifecycle.activate("agent-1")
+
+        request = OrchestrationRequest(
+            message="route through intelligence",
+            agent_id="agent-1",
+            model_usage=ModelUsageRequest(strategy=ModelUsageStrategy.QUALITY),
+        )
+
+        asyncio.run(orchestrator.run(request))
+
+        self.assertEqual(hermes.calls[0]["model"], "provider-quality-v1")
+
+    def test_model_controls_are_applied_before_execution(self) -> None:
+        hermes = FakeHermes()
+        models = ModelRegistry()
+        models.register(
+            Model(
+                id="blocked-model",
+                name="Blocked model",
+                provider="blocked-provider",
+                model_id="provider-blocked-v1",
+                model_type=ModelType.LLM,
+                capabilities=(ModelCapability.TEXT_GENERATION,),
+            )
+        )
+        orchestrator = JarvisOrchestrator(hermes, model_registry=models)  # type: ignore[arg-type]
+        orchestrator.register_agent(Agent(id="agent-1", name="Test Agent", role="test"))
+        orchestrator.lifecycle.activate("agent-1")
+
+        request = OrchestrationRequest(
+            message="must be rejected",
+            agent_id="agent-1",
+            model_usage=ModelUsageRequest(strategy=ModelUsageStrategy.BALANCED),
+            model_controls=ModelControlConstraints(allowed_providers=("allowed-provider",)),
+        )
+
+        with self.assertRaises(LookupError):
+            asyncio.run(orchestrator.run(request))
+        self.assertEqual(hermes.calls, [])
 
     def test_inactive_agent_cannot_be_executed(self) -> None:
         hermes = FakeHermes()
