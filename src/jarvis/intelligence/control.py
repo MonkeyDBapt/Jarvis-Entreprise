@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 
 from .model import Model, ModelType
-from .routing import ModelSelectionRequest
 
 
 @dataclass(frozen=True)
@@ -66,18 +65,18 @@ class ModelControlConstraints:
         ):
             raise LookupError("Le modèle dépasse la température maximale autorisée.")
 
-    def validate_selection(self, request: ModelSelectionRequest) -> None:
+    def validate_selection(self, request: object) -> None:
         """Reject explicit routing constraints that violate hard controls."""
-        if self.allowed_providers and request.provider is not None:
-            if request.provider not in self.allowed_providers:
-                raise LookupError(
-                    f"Le fournisseur demandé '{request.provider}' est interdit par les contraintes."
-                )
-        if self.allowed_model_types and request.model_type is not None:
-            if request.model_type not in self.allowed_model_types:
-                raise LookupError(
-                    f"Le type demandé '{request.model_type.value}' est interdit par les contraintes."
-                )
+        provider = getattr(request, "provider", None)
+        model_type = getattr(request, "model_type", None)
+        if self.allowed_providers and provider is not None and provider not in self.allowed_providers:
+            raise LookupError(
+                f"Le fournisseur demandé '{provider}' est interdit par les contraintes."
+            )
+        if self.allowed_model_types and model_type is not None and model_type not in self.allowed_model_types:
+            raise LookupError(
+                f"Le type demandé '{model_type.value}' est interdit par les contraintes."
+            )
 
 
 __all__ = ["ModelControlConstraints"]
