@@ -1,6 +1,6 @@
 import unittest
 
-from jarvis.core import MemoryKind
+from jarvis.core import MemoryKind, MemoryType
 
 
 class MemoryTypeTaxonomyTests(unittest.TestCase):
@@ -16,7 +16,15 @@ class MemoryTypeTaxonomyTests(unittest.TestCase):
         self.assertEqual(values, {"working", "episodic", "semantic", "user", "system"})
 
     def test_taxonomy_is_independent_from_high_level_memory_type(self) -> None:
-        self.assertNotEqual(set(MemoryKind), set())
+        self.assertEqual(
+            {memory_type.value for memory_type in MemoryType},
+            {"short_term", "long_term", "contextual"},
+        )
+        self.assertEqual(
+            {kind.value for kind in MemoryKind},
+            {"working", "episodic", "semantic", "user", "system"},
+        )
+        self.assertIsNot(MemoryKind, MemoryType)
 
 
 if __name__ == "__main__":
