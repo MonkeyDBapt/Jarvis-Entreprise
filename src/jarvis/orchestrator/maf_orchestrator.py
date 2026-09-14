@@ -21,6 +21,12 @@ from jarvis.core import (
     SecurityController,
     SecurityControlledExecutor,
 )
+from jarvis.intelligence import (
+    ModelControlConstraints,
+    ModelRegistry,
+    ModelRouter,
+    ModelUsageRequest,
+)
 from jarvis.interfaces import AgentRuntime
 from jarvis.interfaces.memory_context import MemoryContextInjector
 from jarvis.runtime import HermesAdapter
@@ -39,15 +45,18 @@ class OrchestrationRequest:
     agent_id: str | None = None
     selection: AgentSelectionCriteria | None = None
     memory_limit: int = 5
+    model_usage: ModelUsageRequest | None = None
+    model_controls: ModelControlConstraints | None = None
 
 
 @dataclass(frozen=True)
 class ResolvedAgentRequest:
-    """Execution request after organizational agent resolution."""
+    """Execution request after organizational and model resolution."""
 
     request: OrchestrationRequest
     agent: Agent
     context: str = ""
+    resolved_model: str = ""
 
 
 class HermesExecutor(Executor):
@@ -75,7 +84,7 @@ class HermesExecutor(Executor):
         response = await asyncio.to_thread(
             self.runtime.chat,
             message,
-            model=request.request.model or str(request.agent.configuration.get("model", "")),
+            model=request.resolved_model,
             session_id=request.request.session_id,
             task_id=request.request.task_id,
             max_iterations=request.request.max_iterations,
@@ -85,7 +94,7 @@ class HermesExecutor(Executor):
 
 
 class JarvisOrchestrator:
-    """JARVIS orchestration entry point for agents, memory and capabilities."""
+    """JARVIS orchestration entry point for agents, intelligence, memory and capabilities."""
 
     def __init__(
         self,
@@ -100,6 +109,8 @@ class JarvisOrchestrator:
         capability_executor: CapabilityExecutor | None = None,
         security_controller: SecurityController | None = None,
         memory_context_injector: MemoryContextInjector | None = None,
+        model_registry: ModelRegistry | None = None,
+        model_router: ModelRouter | None = None,
     ) -> None:
         self.registry = registry or AgentRegistry()
         self.organization = OrganizationManager(
@@ -121,6 +132,13 @@ class JarvisOrchestrator:
         )
 
         self.memory_context_injector = memory_context_injector
+        self.model_registry = model_registry
+        self.model_router = model_router or (
+            ModelRouter(model_registry) if model_registry is not None else None
+        )
+        if self.model_router is not None and self.model_registry is None:
+            raise ValueError("Un routeur de modèles nécessite un registre de modèles.")
+
         self.hermes_executor = HermesExecutor(runtime)
         self.workflow = WorkflowBuilder(start_executor=self.hermes_executor).build()
 
@@ -144,6 +162,18 @@ class JarvisOrchestrator:
         if len(active) > 1:
             raise ValueError("La sélection d'orchestration correspond à plusieurs agents actifs.")
         return active[0]
+
+    def resolve_model(self, request: OrchestrationRequest, agent: Agent) -> str:
+        """Resolve the provider model identifier before entering the MAF workflow."""
+        configured_model = str(agent.configuration.get("model", ""))
+        if request.model_usage is None:
+            return request.model or configured_model
+        if self.model_router is None:
+            raise ValueError("Le routage de modèle nécessite un ModelRegistry configuré.")
+
+        selection = request.model_usage.to_selection_request()
+        result = self.model_router.select(selection, request.model_controls)
+        return result.model.model_id
 
     def register_capability_handler(self, capability_id: str, handler) -> None:
         """Register one concrete implementation at the capability boundary."""
@@ -186,11 +216,17 @@ class JarvisOrchestrator:
         ).text
 
     async def run(self, request: OrchestrationRequest) -> str:
-        """Resolve an active agent, inject memory context, then execute through MAF."""
+        """Resolve agent and model, inject memory context, then execute through MAF."""
         agent = self.resolve_agent(request)
         context = self.build_memory_context(request)
+        resolved_model = self.resolve_model(request, agent)
         result = await self.workflow.run(
-            ResolvedAgentRequest(request=request, agent=agent, context=context)
+            ResolvedAgentRequest(
+                request=request,
+                agent=agent,
+                context=context,
+                resolved_model=resolved_model,
+            )
         )
         outputs = result.get_outputs()
         if not outputs:
