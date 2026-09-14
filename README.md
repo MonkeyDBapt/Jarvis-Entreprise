@@ -113,7 +113,8 @@ Permissions, advanced governance, messaging/events, specialized memory, and spec
 | 4.1 — Modèle de capacité | ✅ Validée |
 | 4.2 — Registre des capacités | ✅ Validée |
 | 4.3 — Affectation capacités / agents | ✅ Validée |
-| 4.4 — Exécution des capacités | ✅ **Validée** |
+| 4.4 — Exécution des capacités | ✅ Validée |
+| 4.5 — Gestion des outils | ✅ **Validée** |
 
 The Phase 4 capability architecture is:
 
@@ -128,11 +129,19 @@ CapabilityExecutor
        │
        ▼
 Capability handler
+       │
+       └── may consume reusable tools
+                  │
+                  ▼
+             ToolRegistry
+                  │
+                  ▼
+              Tool definitions
 ```
 
-The capability executor validates the agent, capability, assignment, and concrete implementation before delegation. It does not embed capability-specific business logic or replace the Phase 2 runtime/orchestration boundaries.
+`Tool` and `ToolRegistry` provide JARVIS-owned management of reusable tool definitions without creating a second execution path. Capability execution remains the authoritative execution boundary; concrete tool behavior is deliberately deferred to the component that will consume the tool.
 
-The detailed record is available in [`docs/phase-4-4-execution-capacites.md`](docs/phase-4-4-execution-capacites.md).
+The detailed record is available in [`docs/phase-4-5-gestion-outils.md`](docs/phase-4-5-gestion-outils.md).
 
 ## Tests
 
