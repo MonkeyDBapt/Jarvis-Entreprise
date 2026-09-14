@@ -6,35 +6,32 @@ from .tool import Tool
 
 
 class ToolRegistry:
-    """Index declarative tool definitions by stable identifier."""
+    """Central index of declarative tool definitions, independent from execution."""
 
     def __init__(self) -> None:
         self._tools: dict[str, Tool] = {}
 
     def register(self, tool: Tool) -> None:
-        """Register a tool by stable identifier."""
+        """Register a tool under its stable identifier."""
         if tool.id in self._tools:
             raise ValueError(f"L'outil '{tool.id}' est déjà enregistré.")
         self._tools[tool.id] = tool
 
     def get(self, tool_id: str) -> Tool:
-        """Retrieve a registered tool."""
-        try:
-            return self._tools[tool_id]
-        except KeyError as exc:
-            raise KeyError(f"Outil inconnu : '{tool_id}'.") from exc
+        """Return a registered tool or raise KeyError when unknown."""
+        return self._tools[tool_id]
+
+    def unregister(self, tool_id: str) -> Tool:
+        """Remove and return a registered tool."""
+        return self._tools.pop(tool_id)
 
     def contains(self, tool_id: str) -> bool:
-        """Return whether a tool identifier is registered."""
+        """Return whether a tool is registered."""
         return tool_id in self._tools
 
     def list_tools(self) -> list[Tool]:
         """Return registered tools in registration order."""
         return list(self._tools.values())
 
-    def unregister(self, tool_id: str) -> Tool:
-        """Remove and return a registered tool."""
-        try:
-            return self._tools.pop(tool_id)
-        except KeyError as exc:
-            raise KeyError(f"Outil inconnu : '{tool_id}'.") from exc
+    def __len__(self) -> int:
+        return len(self._tools)
