@@ -2,18 +2,16 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
+from .control import ModelControlConstraints
 from .model import Model, ModelCapability, ModelType
 from .registry import ModelRegistry
 
 
 @dataclass(frozen=True)
 class ModelSelectionRequest:
-    """Declarative constraints used to select an available model.
-
-    Selection is intentionally provider-neutral and performs no model execution.
-    """
+    """Declarative constraints used to select an available model."""
 
     model_id: str | None = None
     model_type: ModelType | None = None
@@ -38,32 +36,33 @@ class ModelSelectionResult:
 
 
 class ModelRouter:
-    """Select a registered model from declarative routing constraints.
-
-    Routing follows a deterministic precedence:
-    1. explicit model id, when supplied;
-    2. required capabilities;
-    3. model type;
-    4. provider;
-    5. registration order as the stable tie-breaker.
-
-    The router does not call providers, resolve secrets, or execute models.
-    """
+    """Select a registered model from declarative routing and hard controls."""
 
     def __init__(self, registry: ModelRegistry) -> None:
         self._registry = registry
 
-    def select(self, request: ModelSelectionRequest) -> ModelSelectionResult:
-        """Select the first model satisfying all requested constraints."""
+    def select(
+        self,
+        request: ModelSelectionRequest,
+        controls: ModelControlConstraints | None = None,
+    ) -> ModelSelectionResult:
+        """Select the first model satisfying routing and control constraints."""
+        if controls is not None:
+            controls.validate_selection(request)
+
         if request.model_id is not None:
             model = self._registry.get(request.model_id)
             self._ensure_matches(model, request)
+            if controls is not None:
+                controls.validate(model)
             return ModelSelectionResult(model=model, reason="explicit_model_id")
 
-        candidates = list(self._registry.list())
         candidates = [
-            model for model in candidates if self._matches(model, request)
+            model for model in self._registry.list() if self._matches(model, request)
         ]
+        if controls is not None:
+            candidates = [model for model in candidates if self._satisfies_controls(model, controls)]
+
         if not candidates:
             raise LookupError("Aucun modèle enregistré ne satisfait les contraintes de sélection.")
 
@@ -76,6 +75,14 @@ class ModelRouter:
         if request.provider is not None and model.provider != request.provider:
             return False
         return all(model.supports(capability) for capability in request.required_capabilities)
+
+    @staticmethod
+    def _satisfies_controls(model: Model, controls: ModelControlConstraints) -> bool:
+        try:
+            controls.validate(model)
+        except LookupError:
+            return False
+        return True
 
     @classmethod
     def _ensure_matches(cls, model: Model, request: ModelSelectionRequest) -> None:
