@@ -9,6 +9,8 @@ from .capability_execution import CapabilityExecutor, CapabilityHandler
 from .capability_registry import CapabilityRegistry
 from .organization import Agent, Organization, Pole, Team
 from .organization_manager import OrganizationManager
+from .tool import Tool
+from .tool_registry import ToolRegistry
 
 __all__ = [
     "Agent",
@@ -26,4 +28,6 @@ __all__ = [
     "OrganizationManager",
     "Pole",
     "Team",
+    "Tool",
+    "ToolRegistry",
 ]
