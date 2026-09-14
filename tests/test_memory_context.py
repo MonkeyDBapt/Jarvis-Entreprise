@@ -12,7 +12,7 @@ class MemoryContextInjectionTests(unittest.TestCase):
         self.path = Path(self.tempdir.name) / "memory.sqlite3"
         self.store = SQLiteMemoryStore(self.path)
         self.store.save(
-            Memory(id="m1", content="Le projet JARVIS utilise Python.", memory_type=MemoryType.SEMANTIC, scope="project")
+            Memory(id="m1", content="Le projet JARVIS utilise Python.", memory_type=MemoryType.CONTEXTUAL, scope="project")
         )
         self.store.save(
             Memory(id="m2", content="La mémoire doit rester modulaire.", memory_type=MemoryType.LONG_TERM, scope="project")
