@@ -61,11 +61,12 @@ Current Phase 2 scope is intentionally minimal: MAF provides the orchestration b
 
 **3.1 — Modèle d'organisation: validée.**  
 **3.2 — Modèle Agent: validée.**  
-**3.3 — Registre des agents: validée.**
+**3.3 — Registre des agents: validée.**  
+**3.4 — Organisation pôles / équipes: validée.**
 
-The agent registry is a JARVIS-owned index of declarative agent definitions. It provides stable-ID registration, lookup, presence checks, ordered listing, and removal while remaining independent from runtime execution, routing, permissions, governance, and messaging.
+The organizational hierarchy is `Organization → Pole → Team → Agent`. `OrganizationManager` manages poles and teams while keeping the organizational structure independent from runtime execution, routing, permissions, governance, and messaging. The `AgentRegistry` remains the index for declarative agent definitions.
 
-The repository includes unit tests for the organization hierarchy, agent model, registry, runtime interface, and MAF routing. GitHub Actions validates the package and test suite across Python 3.10, 3.11, 3.12, and 3.13.
+The repository includes unit tests for the organization hierarchy, agent model, agent registry, organization management, runtime interface, and MAF routing. GitHub Actions validates the package and test suite across Python 3.10, 3.11, 3.12, and 3.13.
 
 Run the local test suite with:
 
