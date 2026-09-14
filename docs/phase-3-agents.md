@@ -92,3 +92,47 @@ This keeps the separation established in Phase 2 and 3.2: the declarative agent 
 The workflow passed on Python 3.10, 3.11, 3.12, and 3.13. The suite ran 11 tests successfully, including the five dedicated `AgentRegistry` tests covering registration, lookup, duplicate rejection, ordering, removal, and unknown identifiers.
 
 **3.3 — Registre des agents: VALIDÉE.**
+
+## 3.4 — Organisation pôles / équipes
+
+### Decision
+
+The existing organizational model remains the source of truth for the hierarchy. Step 3.4 adds a small JARVIS-owned `OrganizationManager` service to manage the **poles and teams** of an `Organization` without introducing routing, permissions, governance, messaging, or runtime behavior.
+
+### Organization management contract
+
+`OrganizationManager` provides:
+
+- `add_pole(pole)`: add a pole to the managed organization;
+- `get_pole(pole_id)`: retrieve a pole by stable identifier;
+- `remove_pole(pole_id)`: remove and return a pole;
+- `add_team(pole_id, team)`: add a team to an existing pole;
+- `get_team(pole_id, team_id)`: retrieve a team within a pole;
+- `remove_team(pole_id, team_id)`: remove and return a team within a pole.
+
+Duplicate identifiers continue to be rejected by the existing domain model. Unknown poles or teams raise `KeyError`.
+
+### Responsibility boundary
+
+`OrganizationManager` manages **structure only**. It does not execute agents, select agents for tasks, route work, apply permissions or governance, or implement messaging/events.
+
+The resulting separation is:
+
+```text
+OrganizationManager
+        │
+        ├── Pole
+        │    └── Team
+        │         └── Agent
+        │
+        └── organizational structure only
+
+AgentRegistry ── indexes Agent definitions
+AgentRuntime  ── executes agents
+```
+
+### Validation
+
+Step 3.4 is covered by `tests/test_organization_manager.py`, including pole creation/retrieval/removal, team creation/retrieval/removal, duplicate protection, and unknown identifiers.
+
+**3.4 — Organisation pôles / équipes: VALIDÉE.**
