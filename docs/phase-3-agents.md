@@ -87,9 +87,7 @@ This keeps the separation established in Phase 2 and 3.2: the declarative agent 
 
 ### Validation
 
-3.3 is validated by the GitHub Actions `Validation` workflow on commit `d4bbb36f7fcbf752e9e7d347bf8f3e6c6fdd105c`.
-
-The workflow passed on Python 3.10, 3.11, 3.12, and 3.13. The suite ran 11 tests successfully, including the five dedicated `AgentRegistry` tests covering registration, lookup, duplicate rejection, ordering, removal, and unknown identifiers.
+3.3 is validated by the GitHub Actions `Validation` workflow on commit `d4bbb36f7fcbf7528f3e6c6fdd105c`. The workflow passed on Python 3.10, 3.11, 3.12, and 3.13. The suite ran 11 tests successfully, including the five dedicated `AgentRegistry` tests covering registration, lookup, duplicate rejection, ordering, removal, and unknown identifiers.
 
 **3.3 — Registre des agents: VALIDÉE.**
 
@@ -136,3 +134,72 @@ AgentRuntime  ── executes agents
 Step 3.4 is covered by `tests/test_organization_manager.py`, including pole creation/retrieval/removal, team creation/retrieval/removal, duplicate protection, and unknown identifiers.
 
 **3.4 — Organisation pôles / équipes: VALIDÉE.**
+
+## 3.5 — Sélection / affectation
+
+### Decision
+
+Step 3.5 introduces a JARVIS-owned `AgentAssignmentManager` that performs two related organizational operations:
+
+1. **selection** of registered agent definitions using declarative criteria;
+2. **affectation** of a registered agent to an existing organizational team.
+
+Selection is intentionally deterministic and does not invoke a runtime. Supported criteria are role, required capabilities, pole membership, and team membership. When multiple criteria are supplied, they are combined as an AND filter.
+
+### Selection contract
+
+`AgentSelectionCriteria` supports:
+
+- `role`: exact role filter;
+- `capabilities`: required capability names; an agent must provide all of them;
+- `pole_id`: restrict candidates to agents already assigned within a pole;
+- `team_id`: restrict candidates to agents assigned to a team, optionally within a specified pole.
+
+`AgentAssignmentManager.select()` returns registered `Agent` definitions in registry order. No runtime is started and no task is executed.
+
+### Assignment contract
+
+`AgentAssignmentManager.assign(agent_id, pole_id, team_id)`:
+
+- requires the agent to exist in `AgentRegistry`;
+- requires the target pole and team to exist;
+- adds the registered agent definition to the target team;
+- preserves the existing duplicate-ID protection of `Team`.
+
+Unknown agents, poles, or teams raise `KeyError`. Reassigning the same agent to the same team is rejected by the domain model with `ValueError`.
+
+The current organizational model does not impose a global one-team-only constraint: an agent definition may be assigned to more than one team when explicitly requested. Any future exclusivity, permissions, governance, workload, or routing policy remains outside 3.5.
+
+### Responsibility boundary
+
+3.5 is **organizational selection and assignment only**. It does not:
+
+- execute agents;
+- choose a runtime;
+- route a task to an agent;
+- invoke MAF or Hermes;
+- grant permissions;
+- apply governance;
+- manage messaging/events;
+- implement specialized agent logic.
+
+The separation is therefore:
+
+```text
+AgentRegistry
+     │
+     ▼
+AgentAssignmentManager
+     │
+     ├── select() ──► candidate Agent definitions
+     │
+     └── assign() ─► OrganizationManager ─► Pole ─► Team ─► Agent
+
+AgentRuntime ──► execution (separate concern)
+```
+
+### Validation
+
+The dedicated `tests/test_agent_assignment.py` suite covers role/capability selection, assignment to a team, team-based selection, duplicate assignment rejection, unknown agents, and unknown teams.
+
+**3.5 — Sélection / affectation: VALIDÉE.**
