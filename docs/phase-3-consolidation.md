@@ -2,9 +2,9 @@
 
 ## Statut
 
-**Phase 3 — Construction du système d’agents : consolidée.**
+**Phase 3 — Construction du système d’agents : clôturée / consolidée.**
 
-Les étapes 3.1 à 3.7 sont validées avant clôture de la consolidation.
+Les étapes 3.1 à 3.7 sont validées avant l’étape 3.8 de validation et consolidation finale.
 
 ## Périmètre consolidé
 
@@ -15,6 +15,7 @@ Les étapes 3.1 à 3.7 sont validées avant clôture de la consolidation.
 - **3.5 — Sélection / affectation :** sélection déterministe et affectation d’agents via `AgentAssignmentManager`.
 - **3.6 — Cycle de vie :** états `REGISTERED`, `ACTIVE`, `INACTIVE`, `RETIRED` via `AgentLifecycleManager`.
 - **3.7 — Intégration orchestrateur :** résolution d’un agent actif puis exécution via MAF → `AgentRuntime` → `HermesAdapter` → Hermes.
+- **3.8 — Validation / consolidation :** vérification globale du périmètre Phase 3 et clôture de la phase.
 
 ## Architecture de référence
 
@@ -68,6 +69,8 @@ La Phase 3 n’introduit volontairement pas encore les permissions, la gouvernan
 
 La validation CI de l’intégration orchestrateur (run #45) a terminé avec succès sur Python 3.10, 3.11, 3.12 et 3.13. Les tests de Phase 3 couvrent les modèles, le registre, l’organisation, la sélection/affectation, le cycle de vie et le routage orchestré.
 
-**Décision de consolidation :** la Phase 3 est considérée comme techniquement cohérente et prête à servir de base aux phases suivantes.
+La consolidation finale est également reflétée dans le README du dépôt, qui marque explicitement les étapes 3.1 à 3.8 comme validées et la Phase 3 comme clôturée / consolidée.
+
+**Décision de consolidation :** la Phase 3 est considérée comme techniquement cohérente, validée et prête à servir de base aux phases suivantes.
 
 **3.8 — Validation / consolidation : VALIDÉE.**
