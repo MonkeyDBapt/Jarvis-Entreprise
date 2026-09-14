@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sqlite3
 from pathlib import Path
@@ -14,12 +15,7 @@ _TOKEN_RE = re.compile(r"[\wÀ-ÿ]+", re.UNICODE)
 
 
 class SQLiteMemoryRetriever(MemoryRetriever):
-    """Retrieve memories using local lexical matching and deterministic ranking.
-
-    This is the initial Phase 5.4 implementation. It intentionally avoids
-    embeddings or an external vector database; those can be introduced behind
-    the ``MemoryRetriever`` contract later.
-    """
+    """Retrieve memories using local lexical matching and deterministic ranking."""
 
     def __init__(self, path: Union[str, Path] = ".data/memory.sqlite3") -> None:
         self.path = Path(path)
@@ -74,7 +70,7 @@ class SQLiteMemoryRetriever(MemoryRetriever):
                 content=row["content"],
                 memory_type=MemoryType(row["memory_type"]),
                 scope=row["scope"],
-                metadata=__import__("json").loads(row["metadata"]),
+                metadata=json.loads(row["metadata"]),
             )
             results.append(MemorySearchResult(memory=memory, score=score))
 
