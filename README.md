@@ -114,34 +114,38 @@ Permissions, advanced governance, messaging/events, specialized memory, and spec
 | 4.2 — Registre des capacités | ✅ Validée |
 | 4.3 — Affectation capacités / agents | ✅ Validée |
 | 4.4 — Exécution des capacités | ✅ Validée |
-| 4.5 — Gestion des outils | ✅ **Validée** |
+| 4.5 — Gestion des outils | ✅ Validée |
+| 4.6 — Sécurité / contrôle | ✅ Validée |
+| 4.7 — Intégration orchestrateur | ✅ **Validée** |
 
-The Phase 4 capability architecture is:
+The Phase 4 architecture now connects the capability and security domains to the existing JARVIS orchestrator without bypassing established boundaries:
 
 ```text
-CapabilityRegistry
-       │
-       ▼
-CapabilityAssignmentManager
-       │
-       ▼
-CapabilityExecutor
-       │
-       ▼
-Capability handler
-       │
-       └── may consume reusable tools
-                  │
-                  ▼
-             ToolRegistry
-                  │
-                  ▼
-              Tool definitions
+Subject
+  │
+  ▼
+JarvisOrchestrator
+  │
+  ├── Agent resolution / lifecycle
+  │
+  ├── CapabilityRegistry
+  │      │
+  │      ▼
+  │   CapabilityAssignmentManager
+  │      │
+  │      ▼
+  │   SecurityControlledExecutor
+  │      │
+  │      ▼
+  │   CapabilityExecutor
+  │      │
+  │      ▼
+  │   Capability handler
+  │
+  └── Agent request → MAF → AgentRuntime → Hermes
 ```
 
-`Tool` and `ToolRegistry` provide JARVIS-owned management of reusable tool definitions without creating a second execution path. Capability execution remains the authoritative execution boundary; concrete tool behavior is deliberately deferred to the component that will consume the tool.
-
-The detailed record is available in [`docs/phase-4-5-gestion-outils.md`](docs/phase-4-5-gestion-outils.md).
+The detailed record is available in [`docs/phase-4-7-integration-orchestrateur.md`](docs/phase-4-7-integration-orchestrateur.md).
 
 ## Tests
 
