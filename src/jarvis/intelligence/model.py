@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from types import MappingProxyType
 from typing import Mapping
+
+from .configuration import ModelConfiguration
 
 
 class ModelType(str, Enum):
@@ -45,7 +46,7 @@ class Model:
     model_id: str
     model_type: ModelType = ModelType.LLM
     capabilities: tuple[ModelCapability, ...] = ()
-    configuration: Mapping[str, object] = field(default_factory=dict)
+    configuration: ModelConfiguration | Mapping[str, object] = field(default_factory=ModelConfiguration)
     description: str = ""
 
     def __post_init__(self) -> None:
@@ -59,7 +60,8 @@ class Model:
             raise ValueError("L'identifiant fournisseur du modèle ne peut pas être vide.")
         if len(set(self.capabilities)) != len(self.capabilities):
             raise ValueError("Les capacités du modèle ne peuvent pas être dupliquées.")
-        object.__setattr__(self, "configuration", MappingProxyType(dict(self.configuration)))
+        if not isinstance(self.configuration, ModelConfiguration):
+            object.__setattr__(self, "configuration", ModelConfiguration(parameters=self.configuration))
 
     def supports(self, capability: ModelCapability) -> bool:
         """Return whether the model declares the requested capability."""
