@@ -160,7 +160,7 @@ The detailed Phase 4 consolidation record is available in [`docs/phase-4-8-valid
 | 5.4 — Recherche / récupération | ✅ **Validée** |
 | 5.5 — Contexte / injection | ✅ **Validée** |
 | 5.6 — Contrôle / cycle de vie | ✅ **Validée** |
-| 5.7 — Intégration orchestrateur | ⏳ À venir |
+| 5.7 — Intégration orchestrateur | ✅ **Validée** |
 | 5.8 — Validation / consolidation | ⏳ À venir |
 
 Phase 5.2 distinguishes the five functional memory forms `working`, `episodic`, `semantic`, `user`, and `system` through `MemoryKind`, while preserving the three high-level categories from 5.1 (`short_term`, `long_term`, `contextual`).
@@ -173,10 +173,13 @@ Phase 5.5 adds the `MemoryContextInjector` contract and the initial `RetrieverMe
 
 Phase 5.6 adds the `MemoryLifecycle` contract and `MemoryLifecycleManager`. Memories support explicit `active`, `archived`, and `expired` lifecycle states, optional ISO-8601 expiration metadata, restoration, permanent deletion, and explicit purge. Retrieval now excludes archived and expired memories, while legacy memories without lifecycle metadata remain active by default.
 
+Phase 5.7 integrates the memory context boundary into `JarvisOrchestrator`. When a `MemoryContextInjector` is supplied, the orchestrator resolves the active organizational agent, retrieves bounded memory context from the user's request, and passes that context through the existing MAF workflow to the configured runtime. The integration remains optional and preserves the original execution path when no memory injector is configured. `memory_limit` bounds the number of memories requested per orchestration call.
+
 The detailed Phase 5.3 decision record is available in [`docs/phase-5-3-stockage.md`](docs/phase-5-3-stockage.md).
 The detailed Phase 5.4 decision record is available in [`docs/phase-5-4-recherche-recuperation.md`](docs/phase-5-4-recherche-recuperation.md).
 The detailed Phase 5.5 decision record is available in [`docs/phase-5-5-contexte-injection.md`](docs/phase-5-5-contexte-injection.md).
 The detailed Phase 5.6 decision record is available in [`docs/phase-5-6-controle-cycle-vie.md`](docs/phase-5-6-controle-cycle-vie.md).
+The detailed Phase 5.7 decision record is available in [`docs/phase-5-7-integration-orchestrateur.md`](docs/phase-5-7-integration-orchestrateur.md).
 
 ## Tests
 
