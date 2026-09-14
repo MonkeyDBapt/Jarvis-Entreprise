@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .agent_registry import AgentRegistry
-from .organization_manager import OrganizationManager
 from .organization import Agent
+from .organization_manager import OrganizationManager
 
 
 @dataclass(frozen=True)
@@ -70,9 +70,18 @@ class AgentAssignmentManager:
         return [agent for agent in candidates if agent.id in member_ids]
 
     def _agents_in_any_team(self, candidates: list[Agent], team_id: str) -> list[Agent]:
-        for pole in self.organization.organization.poles:
-            for team in pole.teams:
-                if team.id == team_id:
-                    member_ids = {agent.id for agent in team.agents}
-                    return [agent for agent in candidates if agent.id in member_ids]
-        raise KeyError(team_id)
+        matching_teams = [
+            team
+            for pole in self.organization.organization.poles
+            for team in pole.teams
+            if team.id == team_id
+        ]
+        if not matching_teams:
+            raise KeyError(team_id)
+
+        member_ids = {
+            agent.id
+            for team in matching_teams
+            for agent in team.agents
+        }
+        return [agent for agent in candidates if agent.id in member_ids]
