@@ -320,6 +320,6 @@ The orchestration tests verify:
 - agent configuration as the default model;
 - refusal to execute an inactive agent.
 
-GitHub Actions `Validation` run #44 for commit `c1da67fc88ca1a3f6886eeb030b2a5f850095b9f` passed its Python 3.10, 3.12, and 3.13 jobs; the Python 3.11 job was still queued when this documentation was prepared.
+GitHub Actions `Validation` run #45 for commit `b264fbd6cd01c48025beac4b9e019737ad07c2e9` completed successfully on Python 3.10, 3.11, 3.12, and 3.13.
 
-**3.7 — Intégration orchestrateur: IMPLÉMENTÉE ET VALIDÉE TECHNIQUEMENT, sous réserve de la fin du job CI Python 3.11.**
+**3.7 — Intégration orchestrateur: VALIDÉE.**
