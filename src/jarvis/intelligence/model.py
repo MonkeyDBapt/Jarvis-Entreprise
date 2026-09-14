@@ -61,7 +61,19 @@ class Model:
         if len(set(self.capabilities)) != len(self.capabilities):
             raise ValueError("Les capacités du modèle ne peuvent pas être dupliquées.")
         if not isinstance(self.configuration, ModelConfiguration):
-            object.__setattr__(self, "configuration", ModelConfiguration(parameters=self.configuration))
+            values = dict(self.configuration)
+            known_fields = {
+                "endpoint",
+                "context_limit",
+                "temperature",
+                "output_limit",
+                "limits",
+                "secret_refs",
+                "provider_configuration",
+            }
+            typed_values = {key: values.pop(key) for key in tuple(values) if key in known_fields}
+            typed_values["parameters"] = values
+            object.__setattr__(self, "configuration", ModelConfiguration(**typed_values))
 
     def supports(self, capability: ModelCapability) -> bool:
         """Return whether the model declares the requested capability."""
