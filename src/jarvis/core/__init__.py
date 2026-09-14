@@ -4,6 +4,7 @@ from .agent_assignment import AgentAssignmentManager, AgentSelectionCriteria
 from .agent_lifecycle import AgentLifecycleManager, AgentLifecycleState
 from .agent_registry import AgentRegistry
 from .capability import Capability
+from .capability_assignment import CapabilityAssignmentManager
 from .capability_registry import CapabilityRegistry
 from .organization import Agent, Organization, Pole, Team
 from .organization_manager import OrganizationManager
@@ -16,6 +17,7 @@ __all__ = [
     "AgentRegistry",
     "AgentSelectionCriteria",
     "Capability",
+    "CapabilityAssignmentManager",
     "CapabilityRegistry",
     "Organization",
     "OrganizationManager",
