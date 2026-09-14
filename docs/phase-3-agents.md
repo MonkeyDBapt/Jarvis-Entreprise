@@ -87,7 +87,7 @@ This keeps the separation established in Phase 2 and 3.2: the declarative agent 
 
 ### Validation
 
-3.3 is validated by the GitHub Actions `Validation` workflow on commit `d4bbb36f7fcbf7528f3e6c6fdd105c`. The workflow passed on Python 3.10, 3.11, 3.12, and 3.13. The suite ran 11 tests successfully, including the five dedicated `AgentRegistry` tests covering registration, lookup, duplicate rejection, ordering, removal, and unknown identifiers.
+3.3 is validated by the GitHub Actions `Validation` workflow on commit `d4bbb36f7fcbf752e9e7d347bf8f3e6c6fdd105c`. The workflow passed on Python 3.10, 3.11, 3.12, and 3.13. The suite ran 11 tests successfully, including the five dedicated `AgentRegistry` tests covering registration, lookup, duplicate rejection, ordering, removal, and unknown identifiers.
 
 **3.3 — Registre des agents: VALIDÉE.**
 
@@ -254,3 +254,72 @@ This preserves the separation established by Phase 2 and the preceding Phase 3 s
 The GitHub Actions `Validation` workflow for the lifecycle implementation passed on Python 3.10, 3.11, 3.12, and 3.13. The final documentation commit is also covered by a successful validation run.
 
 **3.6 — Cycle de vie: VALIDÉE.**
+
+## 3.7 — Intégration orchestrateur
+
+### Decision
+
+Step 3.7 connects the Phase 3 agent-management services to the existing Phase 2 orchestration boundary without moving runtime concerns into the domain model.
+
+The orchestrator now performs the complete resolution path:
+
+```text
+OrchestrationRequest
+        │
+        ▼
+AgentRegistry
+        │
+        ▼
+AgentAssignmentManager / direct agent id
+        │
+        ▼
+AgentLifecycleManager
+        │
+        ▼
+ResolvedAgentRequest
+        │
+        ▼
+Microsoft Agent Framework
+        │
+        ▼
+AgentRuntime
+        │
+        ▼
+HermesAdapter → Hermes
+```
+
+### Orchestration contract
+
+`OrchestrationRequest` now supports:
+
+- `agent_id`: explicit agent selection;
+- `selection`: declarative `AgentSelectionCriteria` when the caller wants the orchestrator to resolve an agent.
+
+The orchestrator resolves exactly one **active** agent before invoking MAF. An explicit inactive/unknown agent is rejected. A selection producing no active candidate is rejected, and a selection producing multiple active candidates is rejected rather than making an arbitrary choice.
+
+The agent's declarative `configuration["model"]` supplies the model when the request does not specify one. Explicit request parameters remain authoritative.
+
+### Responsibility boundary
+
+3.7 deliberately keeps the responsibilities separated:
+
+- Phase 3 core services define, index, organize, select, assign, and lifecycle-manage agents;
+- `JarvisOrchestrator` resolves the organizational agent and creates the execution request;
+- MAF remains the workflow engine;
+- `AgentRuntime` remains the stable execution contract;
+- `HermesAdapter` remains the current runtime implementation.
+
+No permissions, governance, messaging/events, memory implementation, or specialized agent logic is introduced by 3.7.
+
+### Validation
+
+The orchestration tests verify:
+
+- active agent resolution by explicit identifier;
+- MAF → runtime execution through the resolved agent;
+- agent configuration as the default model;
+- refusal to execute an inactive agent.
+
+GitHub Actions `Validation` run #44 for commit `c1da67fc88ca1a3f6886eeb030b2a5f850095b9f` passed its Python 3.10, 3.12, and 3.13 jobs; the Python 3.11 job was still queued when this documentation was prepared.
+
+**3.7 — Intégration orchestrateur: IMPLÉMENTÉE ET VALIDÉE TECHNIQUEMENT, sous réserve de la fin du job CI Python 3.11.**
