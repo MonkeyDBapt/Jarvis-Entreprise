@@ -106,7 +106,7 @@ Permissions, advanced governance, messaging/events, specialized memory, and spec
 
 ### Phase 4 status
 
-**Phase 4 — Capacités : en cours.**
+**Phase 4 — Capacités : clôturée / consolidée.**
 
 | Étape | Statut |
 |---|---|
@@ -116,9 +116,10 @@ Permissions, advanced governance, messaging/events, specialized memory, and spec
 | 4.4 — Exécution des capacités | ✅ Validée |
 | 4.5 — Gestion des outils | ✅ Validée |
 | 4.6 — Sécurité / contrôle | ✅ Validée |
-| 4.7 — Intégration orchestrateur | ✅ **Validée** |
+| 4.7 — Intégration orchestrateur | ✅ Validée |
+| 4.8 — Validation / consolidation | ✅ **Validée** |
 
-The Phase 4 architecture now connects the capability and security domains to the existing JARVIS orchestrator without bypassing established boundaries:
+The consolidated Phase 4 architecture connects the capability and security domains to the existing JARVIS orchestrator without bypassing established boundaries:
 
 ```text
 Subject
@@ -145,7 +146,7 @@ JarvisOrchestrator
   └── Agent request → MAF → AgentRuntime → Hermes
 ```
 
-The detailed record is available in [`docs/phase-4-7-integration-orchestrateur.md`](docs/phase-4-7-integration-orchestrateur.md).
+The detailed Phase 4 consolidation record is available in [`docs/phase-4-8-validation-consolidation.md`](docs/phase-4-8-validation-consolidation.md).
 
 ## Tests
 
