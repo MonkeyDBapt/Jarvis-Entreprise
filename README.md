@@ -102,9 +102,37 @@ AgentRuntime
 HermesAdapter → Hermes → LLM
 ```
 
-The detailed records are available in [`docs/phase-3-agents.md`](docs/phase-3-agents.md) and [`docs/phase-3-consolidation.md`](docs/phase-3-consolidation.md).
-
 Permissions, advanced governance, messaging/events, specialized memory, and specialized business agents remain outside the Phase 3 consolidation and are reserved for later phases.
+
+### Phase 4 status
+
+**Phase 4 — Capacités : en cours.**
+
+| Étape | Statut |
+|---|---|
+| 4.1 — Modèle de capacité | ✅ Validée |
+| 4.2 — Registre des capacités | ✅ Validée |
+| 4.3 — Affectation capacités / agents | ✅ Validée |
+| 4.4 — Exécution des capacités | ✅ Implémentée / validation CI à confirmer |
+
+The Phase 4 capability architecture is:
+
+```text
+CapabilityRegistry
+       │
+       ▼
+CapabilityAssignmentManager
+       │
+       ▼
+CapabilityExecutor
+       │
+       ▼
+Capability handler
+```
+
+The capability executor validates the agent, capability, assignment, and concrete implementation before delegation. It does not embed capability-specific business logic or replace the Phase 2 runtime/orchestration boundaries.
+
+The detailed record is available in [`docs/phase-4-4-execution-capacites.md`](docs/phase-4-4-execution-capacites.md).
 
 ## Tests
 
