@@ -148,6 +148,23 @@ JarvisOrchestrator
 
 The detailed Phase 4 consolidation record is available in [`docs/phase-4-8-validation-consolidation.md`](docs/phase-4-8-validation-consolidation.md).
 
+### Phase 5 status
+
+**Phase 5 — Mémoire : en cours.**
+
+| Étape | Statut |
+|---|---|
+| 5.1 — Modèle de mémoire | ✅ Validée |
+| 5.2 — Types / catégories | ✅ **Validée** |
+| 5.3 — Stockage | ⏳ À venir |
+| 5.4 — Recherche / récupération | ⏳ À venir |
+| 5.5 — Contexte / injection | ⏳ À venir |
+| 5.6 — Contrôle / cycle de vie | ⏳ À venir |
+| 5.7 — Intégration orchestrateur | ⏳ À venir |
+| 5.8 — Validation / consolidation | ⏳ À venir |
+
+Phase 5.2 distinguishes the five functional memory forms `working`, `episodic`, `semantic`, `user`, and `system` through `MemoryKind`, while preserving the three high-level categories from 5.1 (`short_term`, `long_term`, `contextual`). Storage, retrieval, lifecycle, and orchestration integration remain outside this step.
+
 ## Tests
 
 Run the local test suite with:
