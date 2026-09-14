@@ -65,4 +65,6 @@ Les tests couvrent :
 - rejet d'une contrainte provider contradictoire ;
 - immutabilité des métadonnées de contrôle.
 
+La validation finale est exécutée par la CI GitHub sur Python 3.10, 3.11, 3.12 et 3.13.
+
 Aucun secret ou credential réel n'est ajouté au dépôt.
