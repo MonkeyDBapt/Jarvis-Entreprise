@@ -22,6 +22,8 @@ from jarvis.core import (
     SecurityControlledExecutor,
 )
 from jarvis.interfaces import AgentRuntime
+from jarvis.interfaces.memory_context import MemoryContextInjector
+from jarvis.memory import RetrieverMemoryContextInjector, SQLiteMemoryRetriever
 from jarvis.runtime import HermesAdapter
 
 
@@ -37,6 +39,7 @@ class OrchestrationRequest:
     timeout: float | None = None
     agent_id: str | None = None
     selection: AgentSelectionCriteria | None = None
+    memory_limit: int = 5
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,7 @@ class ResolvedAgentRequest:
 
     request: OrchestrationRequest
     agent: Agent
+    context: str = ""
 
 
 class HermesExecutor(Executor):
@@ -60,9 +64,18 @@ class HermesExecutor(Executor):
         request: ResolvedAgentRequest,
         ctx: WorkflowContext[str],
     ) -> None:
+        message = request.request.message
+        if request.context:
+            message = (
+                "<jarvis_memory_context>\n"
+                f"{request.context}\n"
+                "</jarvis_memory_context>\n\n"
+                f"{message}"
+            )
+
         response = await asyncio.to_thread(
             self.runtime.chat,
-            request.request.message,
+            message,
             model=request.request.model or str(request.agent.configuration.get("model", "")),
             session_id=request.request.session_id,
             task_id=request.request.task_id,
@@ -73,7 +86,7 @@ class HermesExecutor(Executor):
 
 
 class JarvisOrchestrator:
-    """JARVIS orchestration entry point for agents and capabilities."""
+    """JARVIS orchestration entry point for agents, memory and capabilities."""
 
     def __init__(
         self,
@@ -87,6 +100,7 @@ class JarvisOrchestrator:
         capability_assignment: CapabilityAssignmentManager | None = None,
         capability_executor: CapabilityExecutor | None = None,
         security_controller: SecurityController | None = None,
+        memory_context_injector: MemoryContextInjector | None = None,
     ) -> None:
         self.registry = registry or AgentRegistry()
         self.organization = OrganizationManager(
@@ -107,6 +121,7 @@ class JarvisOrchestrator:
             self.capability_executor, self.security_controller
         )
 
+        self.memory_context_injector = memory_context_injector
         self.hermes_executor = HermesExecutor(runtime)
         self.workflow = WorkflowBuilder(start_executor=self.hermes_executor).build()
 
@@ -160,11 +175,33 @@ class JarvisOrchestrator:
             return False
         return self.security_executor.can_execute(subject_id, agent_id, capability_id)
 
+    def build_memory_context(self, request: OrchestrationRequest) -> str:
+        """Build prompt-ready memory context when a memory injector is configured."""
+        if request.memory_limit < 1:
+            raise ValueError("La limite de mémoire doit être supérieure à zéro.")
+        if self.memory_context_injector is None:
+            return ""
+        return self.memory_context_injector.build_context(
+            request.message,
+            limit=request.memory_limit,
+        ).text
+
     async def run(self, request: OrchestrationRequest) -> str:
-        """Resolve an active organizational agent, then execute through the MAF workflow."""
+        """Resolve an active agent, inject memory context, then execute through MAF."""
         agent = self.resolve_agent(request)
-        result = await self.workflow.run(ResolvedAgentRequest(request=request, agent=agent))
+        context = self.build_memory_context(request)
+        result = await self.workflow.run(
+            ResolvedAgentRequest(request=request, agent=agent, context=context)
+        )
         outputs = result.get_outputs()
         if not outputs:
             raise RuntimeError("Le workflow M.A.F. n'a produit aucune sortie.")
         return str(outputs[-1])
+
+
+__all__ = [
+    "HermesExecutor",
+    "JarvisOrchestrator",
+    "OrchestrationRequest",
+    "ResolvedAgentRequest",
+]
