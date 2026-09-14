@@ -177,6 +177,19 @@ Phase 5.7 integrates the memory context boundary into `JarvisOrchestrator`. When
 
 Phase 5.8 validates and consolidates the complete memory architecture. The memory contracts remain separated, lifecycle rules remain enforced during retrieval, the orchestrator depends only on the context-injection boundary, and the existing Phase 1–4 execution and security boundaries remain intact. The detailed consolidation record is available in [`docs/phase-5-8-validation-consolidation.md`](docs/phase-5-8-validation-consolidation.md).
 
+### Phase 6 status
+
+**Phase 6 — Modèles / intelligence : en cours.**
+
+| Étape | Statut |
+|---|---|
+| 6.1 — Modèle d’intelligence | ✅ Validée |
+| 6.2 — Registre des modèles | ✅ **Validée** |
+
+Phase 6.1 defines the provider-independent declarative `Model`, `ModelType`, and `ModelCapability` contracts. Phase 6.2 adds `ModelRegistry`, which centrally registers models by stable identifier, rejects duplicates, supports lookup and removal, and exposes a deterministic immutable registration view. Model selection/routing, provider adapters, execution, credentials, and intelligence strategies remain outside 6.2 and are reserved for later Phase 6 steps.
+
+The detailed Phase 6.2 record is available in [`docs/phase-6-2-model-registry.md`](docs/phase-6-2-model-registry.md).
+
 ## Tests
 
 Run the local test suite with:
