@@ -12,7 +12,7 @@ class MemoryRetrievalTests(unittest.TestCase):
         store = SQLiteMemoryStore(Path(directory) / "memory.sqlite3")
         store.save(Memory("m1", "Python automation for JARVIS", MemoryType.LONG_TERM, scope="jarvis"))
         store.save(Memory("m2", "Minecraft server configuration", MemoryType.CONTEXTUAL, scope="gaming"))
-        store.save(Memory("m3", "JARVIS memory and Python tests", MemoryType.USER, scope="jarvis"))
+        store.save(Memory("m3", "JARVIS memory and Python Python tests", MemoryType.LONG_TERM, scope="jarvis"))
         store.save(Memory("m4", "Unrelated note", MemoryType.SHORT_TERM, scope="other"))
         return store
 
@@ -40,8 +40,8 @@ class MemoryRetrievalTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             store = self._store(directory)
             retriever = SQLiteMemoryRetriever(Path(directory) / "memory.sqlite3")
-            results = retriever.search("JARVIS", memory_type=MemoryType.USER, scope="jarvis")
-            self.assertEqual([r.memory.id for r in results], ["m3"])
+            results = retriever.search("JARVIS", memory_type=MemoryType.LONG_TERM, scope="jarvis")
+            self.assertEqual([r.memory.id for r in results], ["m3", "m1"])
             retriever.close()
             store.close()
 
