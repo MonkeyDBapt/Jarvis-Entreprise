@@ -188,6 +188,7 @@ Phase 5.8 validates and consolidates the complete memory architecture. The memor
 | 6.3 — Configuration | ✅ **Validée** |
 | 6.4 — Sélection / routage | ✅ **Validée** |
 | 6.5 — Stratégies d’utilisation | ✅ **Validée** |
+| 6.6 — Contrôle / contraintes | ✅ **Validée** |
 
 Phase 6.1 defines the provider-independent declarative `Model`, `ModelType`, and `ModelCapability` contracts. Phase 6.2 adds `ModelRegistry`, which centrally registers models by stable identifier, rejects duplicates, supports lookup and removal, and exposes a deterministic immutable registration view. Phase 6.3 adds the immutable provider-neutral `ModelConfiguration` boundary for endpoints, parameters, context/output limits, operational limits, secret references, and provider-specific configuration. Secrets themselves are never stored in the model configuration or committed to Git.
 
@@ -195,7 +196,9 @@ Phase 6.4 adds the provider-neutral `ModelSelectionRequest`, `ModelSelectionResu
 
 Phase 6.5 adds provider-neutral model usage strategies. `ModelUsageStrategy` expresses high-level intent (`balanced`, `fast`, `quality`, `economical`, `reasoning`) and `ModelUsageRequest` translates that intent plus explicit constraints into the existing `ModelSelectionRequest` contract. Strategy resolution performs no provider execution, secret resolution, or runtime optimization.
 
-The detailed consolidation records are available in [`docs/phase-6-2-model-registry.md`](docs/phase-6-2-model-registry.md), [`docs/phase-6-3-configuration.md`](docs/phase-6-3-configuration.md), [`docs/phase-6-4-selection-routage.md`](docs/phase-6-4-selection-routage.md), and [`docs/phase-6-5-strategies-utilisation.md`](docs/phase-6-5-strategies-utilisation.md).
+Phase 6.6 adds `ModelControlConstraints` as a hard, provider-neutral control boundary. Constraints can restrict providers and model types and enforce declared maximum context, output, and temperature limits. `ModelRouter` applies these controls before accepting a model, including explicit model requests, and deterministically rejects incompatible requests. No provider execution, secret resolution, live quota, price, latency, or availability lookup is introduced.
+
+The detailed consolidation records are available in [`docs/phase-6-2-model-registry.md`](docs/phase-6-2-model-registry.md), [`docs/phase-6-3-configuration.md`](docs/phase-6-3-configuration.md), [`docs/phase-6-4-selection-routage.md`](docs/phase-6-4-selection-routage.md), [`docs/phase-6-5-strategies-utilisation.md`](docs/phase-6-5-strategies-utilisation.md), and [`docs/phase-6-6-controle-contraintes.md`](docs/phase-6-6-controle-contraintes.md).
 
 ## Tests
 
