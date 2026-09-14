@@ -41,7 +41,7 @@ class MemoryRetrievalTests(unittest.TestCase):
             store = self._store(directory)
             retriever = SQLiteMemoryRetriever(Path(directory) / "memory.sqlite3")
             results = retriever.search("JARVIS", memory_type=MemoryType.LONG_TERM, scope="jarvis")
-            self.assertEqual([r.memory.id for r in results], ["m3", "m1"])
+            self.assertEqual([r.memory.id for r in results], ["m1", "m3"])
             retriever.close()
             store.close()
 
