@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Union
 
 from jarvis.core.memory import Memory, MemoryType
 from jarvis.interfaces.memory_store import MemoryStore
+from jarvis.memory.lifecycle import _EXPIRES_AT_KEY, MemoryLifecycleState, is_expired
 
 
 class SQLiteMemoryStore(MemoryStore):
@@ -85,6 +87,22 @@ class SQLiteMemoryStore(MemoryStore):
     def count(self) -> int:
         row = self._connection.execute("SELECT COUNT(*) AS count FROM memories").fetchone()
         return int(row["count"])
+
+    def purge_expired(self) -> int:
+        """Delete memories explicitly marked expired or past their expiry date."""
+        rows = self._connection.execute("SELECT id, metadata FROM memories").fetchall()
+        ids: list[str] = []
+        now = datetime.now(timezone.utc)
+        for row in rows:
+            metadata = json.loads(row["metadata"])
+            state = metadata.get("lifecycle_state", MemoryLifecycleState.ACTIVE.value)
+            if state == MemoryLifecycleState.EXPIRED.value or is_expired(metadata, now=now):
+                ids.append(row["id"])
+        if not ids:
+            return 0
+        self._connection.executemany("DELETE FROM memories WHERE id = ?", [(memory_id,) for memory_id in ids])
+        self._connection.commit()
+        return len(ids)
 
     def close(self) -> None:
         self._connection.close()
