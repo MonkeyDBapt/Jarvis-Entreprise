@@ -9,6 +9,7 @@ from .capability import Capability
 from .capability_assignment import CapabilityAssignmentManager
 from .capability_execution import CapabilityExecutor, CapabilityHandler
 from .capability_registry import CapabilityRegistry
+from .control import ControlDecision, ControlEvaluator, ControlOutcome
 from .memory import Memory, MemoryType
 from .memory_types import MemoryKind
 from .organization import Agent, Organization, Pole, Team
@@ -38,6 +39,9 @@ __all__ = [
     "CapabilityExecutor",
     "CapabilityHandler",
     "CapabilityRegistry",
+    "ControlDecision",
+    "ControlEvaluator",
+    "ControlOutcome",
     "Memory",
     "MemoryKind",
     "MemoryType",
