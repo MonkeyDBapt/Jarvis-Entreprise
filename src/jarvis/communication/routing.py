@@ -8,6 +8,7 @@ from typing import Protocol
 from .events import EventDelivery
 from .messages import MessageDelivery
 from .models import ChannelKind, CommunicationEvent, CommunicationMessage
+from .transports import CommunicationTransportRegistry
 
 DirectHandler = Callable[[CommunicationMessage], None]
 
@@ -31,21 +32,18 @@ class CommunicationRoutingError(RuntimeError):
 
 
 class CommunicationRouter:
-    """Deterministic router over direct, message, and event delivery boundaries.
-
-    Direct communication is intentionally local and synchronous. Point-to-point
-    messages use ``MessageDelivery`` and published events use ``EventDelivery``.
-    The router owns channel selection while concrete transports remain replaceable.
-    """
+    """Deterministic router over logical channels and replaceable transports."""
 
     def __init__(
         self,
         *,
         message_delivery: MessageDelivery | None = None,
         event_delivery: EventDelivery | None = None,
+        transport_registry: CommunicationTransportRegistry | None = None,
     ) -> None:
         self._message_delivery = message_delivery
         self._event_delivery = event_delivery
+        self._transport_registry = transport_registry
         self._direct_handlers: dict[str, DirectHandler] = {}
 
     def register_direct(self, recipient_id: str, handler: DirectHandler) -> None:
@@ -83,6 +81,13 @@ class CommunicationRouter:
             handler(message)
             return
 
+        if self._transport_registry is not None:
+            transport = self._transport_registry.get(ChannelKind.MESSAGE)
+            if transport is None:
+                raise CommunicationRoutingError("Aucun transport message n'est configuré.")
+            transport.send_message(message)
+            return
+
         if self._message_delivery is None:
             raise CommunicationRoutingError("Aucun MessageDelivery n'est configuré.")
         self._message_delivery.send(message)
@@ -94,6 +99,14 @@ class CommunicationRouter:
             raise TypeError("event doit être un CommunicationEvent.")
         if channel is not ChannelKind.EVENT:
             raise CommunicationRoutingError("Un CommunicationEvent doit utiliser le canal event.")
+
+        if self._transport_registry is not None:
+            transport = self._transport_registry.get(ChannelKind.EVENT)
+            if transport is None:
+                raise CommunicationRoutingError("Aucun transport event n'est configuré.")
+            transport.publish_event(event)
+            return
+
         if self._event_delivery is None:
             raise CommunicationRoutingError("Aucun EventDelivery n'est configuré.")
         self._event_delivery.publish(event)
