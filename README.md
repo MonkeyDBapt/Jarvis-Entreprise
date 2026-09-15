@@ -131,9 +131,9 @@ The verification and observability layer is provider-independent. It exposes ver
 | **10.2** | **Détection / classification** | **✅ Validée** |
 | **10.3** | **Gestion des erreurs** | **✅ Validée** |
 | **10.4** | **Isolation / containment** | **✅ Validée** |
-| **10.5** | **Retry / récupération** | **🟢 Implémentée — validation CI en cours** |
+| **10.5** | **Retry / récupération** | **✅ Validée** |
 
-The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection normalizes observations into that contract. Error management normalizes execution errors into deterministic handling decisions without performing side effects. Containment produces explicit, deterministic isolation decisions without directly mutating runtime state. Recovery now adds bounded retry and recovery decisions without performing retries, sleeps, state restoration or persistence. See [`docs/phase-10-5-retry-recovery.md`](docs/phase-10-5-retry-recovery.md).
+The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection normalizes observations into that contract. Error management normalizes execution errors into deterministic handling decisions without performing side effects. Containment produces explicit, deterministic isolation decisions without directly mutating runtime state. Recovery provides bounded retry and recovery decisions without performing retries, sleeps, state restoration or persistence. See [`docs/phase-10-5-retry-recovery.md`](docs/phase-10-5-retry-recovery.md).
 
 ## Validation and CI
 
