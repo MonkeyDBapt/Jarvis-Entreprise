@@ -25,6 +25,7 @@ JARVIS Enterprise
        │                 → MetricRegistry → MetricSnapshot
        │                 → TraceContext → TraceSpan → TraceRecorder
        │                 → HealthRegistry → SystemHealth
+       │                 → AuditEvent → AuditRecorder
        │
        ▼
 JarvisOrchestrator
@@ -122,6 +123,10 @@ The permission and autonomy layer remains distinct from capabilities. `Authoriza
 ### 9.5 — État / santé système
 
 **✅ Validée / consolidée.** JARVIS now exposes provider-independent system health contracts through `HealthCheck`, `HealthCheckResult`, `HealthRegistry` and `SystemHealth`. Health states are normalized as `healthy`, `degraded`, `unhealthy` and `unknown`; critical failures make the aggregate state unhealthy, while non-critical failures or unknown observations degrade the aggregate state. See [`docs/phase-9-5-etat-sante-systeme.md`](docs/phase-9-5-etat-sante-systeme.md).
+
+### 9.6 — Audit / événements observables
+
+**✅ Validée / consolidée.** JARVIS now exposes provider-independent audit contracts through `AuditEvent`, `AuditEventType` and `AuditRecorder`. Audit events capture stable identity, UTC time, action/component context, optional actor/agent/task identifiers, correlation and trace identifiers, outcome/reason and structured metadata. The recorder supports deterministic filtering by event type, correlation and trace without imposing persistence or an external audit backend. See [`docs/phase-9-6-audit-evenements-observables.md`](docs/phase-9-6-audit-evenements-observables.md).
 
 ## Validation and CI
 
