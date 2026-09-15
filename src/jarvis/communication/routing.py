@@ -1,10 +1,11 @@
-"""Transport-independent communication routing."""
+"""Transport-independent communication routing with optional security control."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Protocol
 
+from ..core.security import SecurityController
 from .events import EventDelivery
 from .messages import MessageDelivery
 from .models import ChannelKind, CommunicationEvent, CommunicationMessage
@@ -32,7 +33,7 @@ class CommunicationRoutingError(RuntimeError):
 
 
 class CommunicationRouter:
-    """Deterministic router over logical channels and replaceable transports."""
+    """Deterministic router over logical channels, transports, and security control."""
 
     def __init__(
         self,
@@ -40,10 +41,12 @@ class CommunicationRouter:
         message_delivery: MessageDelivery | None = None,
         event_delivery: EventDelivery | None = None,
         transport_registry: CommunicationTransportRegistry | None = None,
+        security_controller: SecurityController | None = None,
     ) -> None:
         self._message_delivery = message_delivery
         self._event_delivery = event_delivery
         self._transport_registry = transport_registry
+        self._security_controller = security_controller
         self._direct_handlers: dict[str, DirectHandler] = {}
 
     def register_direct(self, recipient_id: str, handler: DirectHandler) -> None:
@@ -60,6 +63,50 @@ class CommunicationRouter:
             raise ValueError("recipient_id doit être un identifiant non vide.")
         self._direct_handlers.pop(recipient_id, None)
 
+    def _authorize_message(self, message: CommunicationMessage) -> None:
+        if self._security_controller is None:
+            return
+        self._security_controller.authorize(
+            message.sender_id,
+            "send",
+            f"communication:{message.recipient_id}",
+        )
+
+    def _authorize_event(self, event: CommunicationEvent) -> None:
+        if self._security_controller is None:
+            return
+        self._security_controller.authorize(
+            event.source_id,
+            "publish",
+            f"event:{event.event_type}",
+        )
+
+    def can_route_message(self, message: CommunicationMessage) -> bool:
+        """Return whether security permits sending the message when configured."""
+        if not isinstance(message, CommunicationMessage):
+            raise TypeError("message doit être un CommunicationMessage.")
+        if message.recipient_id is None:
+            return False
+        if self._security_controller is None:
+            return True
+        return self._security_controller.is_allowed(
+            message.sender_id,
+            "send",
+            f"communication:{message.recipient_id}",
+        )
+
+    def can_route_event(self, event: CommunicationEvent) -> bool:
+        """Return whether security permits publishing the event when configured."""
+        if not isinstance(event, CommunicationEvent):
+            raise TypeError("event doit être un CommunicationEvent.")
+        if self._security_controller is None:
+            return True
+        return self._security_controller.is_allowed(
+            event.source_id,
+            "publish",
+            f"event:{event.event_type}",
+        )
+
     def route_message(
         self, message: CommunicationMessage, channel: ChannelKind = ChannelKind.MESSAGE
     ) -> None:
@@ -71,6 +118,8 @@ class CommunicationRouter:
             )
         if message.recipient_id is None:
             raise CommunicationRoutingError("Un message routé doit avoir un recipient_id.")
+
+        self._authorize_message(message)
 
         if channel is ChannelKind.DIRECT:
             handler = self._direct_handlers.get(message.recipient_id)
@@ -99,6 +148,8 @@ class CommunicationRouter:
             raise TypeError("event doit être un CommunicationEvent.")
         if channel is not ChannelKind.EVENT:
             raise CommunicationRoutingError("Un CommunicationEvent doit utiliser le canal event.")
+
+        self._authorize_event(event)
 
         if self._transport_registry is not None:
             transport = self._transport_registry.get(ChannelKind.EVENT)
