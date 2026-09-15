@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from datetime import datetime, timezone
 
 from agent_framework import Executor, WorkflowBuilder, WorkflowContext, handler
 
@@ -42,6 +43,24 @@ from jarvis.intelligence import (
 )
 from jarvis.interfaces import AgentRuntime
 from jarvis.interfaces.memory_context import MemoryContextInjector
+from jarvis.observability import (
+    AuditEvent,
+    AuditEventType,
+    AuditRecorder,
+    HealthCheck,
+    HealthCheckResult,
+    HealthRegistry,
+    HealthStatus,
+    LogLevel,
+    MetricDefinition,
+    MetricKind,
+    MetricRegistry,
+    StructuredLogger,
+    TraceContext,
+    TraceRecorder,
+    TraceSpan,
+    TraceStatus,
+)
 from jarvis.runtime import HermesAdapter
 
 
@@ -65,6 +84,8 @@ class OrchestrationRequest:
     resource: str | None = None
     authorization_scope: str | None = None
     autonomy_policy: AutonomyPolicy | None = None
+    correlation_id: str | None = None
+    trace_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -112,7 +133,7 @@ class HermesExecutor(Executor):
 
 
 class JarvisOrchestrator:
-    """JARVIS orchestration entry point for agents, intelligence, memory, capabilities, communication and control."""
+    """JARVIS orchestration entry point for agents, intelligence, memory, capabilities, communication, control and observability."""
 
     def __init__(
         self,
@@ -133,6 +154,11 @@ class JarvisOrchestrator:
         permission_registry: PermissionAssignmentRegistry | None = None,
         authorization_evaluator: AuthorizationEvaluator | None = None,
         control_evaluator: ControlEvaluator | None = None,
+        logger: StructuredLogger | None = None,
+        metric_registry: MetricRegistry | None = None,
+        trace_recorder: TraceRecorder | None = None,
+        audit_recorder: AuditRecorder | None = None,
+        health_registry: HealthRegistry | None = None,
     ) -> None:
         self.registry = registry or AgentRegistry()
         self.organization = OrganizationManager(
@@ -172,8 +198,61 @@ class JarvisOrchestrator:
             raise ValueError("Un évaluateur d'autorisation nécessite un registre de permissions.")
         self.control_evaluator = control_evaluator or ControlEvaluator()
 
+        self.logger = logger or StructuredLogger("orchestrator")
+        self.metric_registry = metric_registry or MetricRegistry()
+        self.trace_recorder = trace_recorder or TraceRecorder()
+        self.audit_recorder = audit_recorder or AuditRecorder()
+        self.health_registry = health_registry or HealthRegistry()
+        self._register_observability_metrics()
+        self._register_health_checks()
+
         self.hermes_executor = HermesExecutor(runtime)
         self.workflow = WorkflowBuilder(start_executor=self.hermes_executor).build()
+
+    def _register_observability_metrics(self) -> None:
+        definitions = (
+            MetricDefinition("jarvis.orchestrator.requests", MetricKind.COUNTER),
+            MetricDefinition("jarvis.orchestrator.successes", MetricKind.COUNTER),
+            MetricDefinition("jarvis.orchestrator.failures", MetricKind.COUNTER),
+            MetricDefinition("jarvis.orchestrator.duration_seconds", MetricKind.HISTOGRAM, unit="s"),
+        )
+        for definition in definitions:
+            self.metric_registry.register(definition)
+
+    def _register_health_checks(self) -> None:
+        self.health_registry.register(
+            HealthCheck(
+                name="orchestrator.workflow",
+                component="orchestrator",
+                description="MAF workflow is constructed and ready for execution.",
+                critical=True,
+            )
+        )
+        self.health_registry.record(
+            HealthCheckResult(
+                name="orchestrator.workflow",
+                component="orchestrator",
+                status=HealthStatus.HEALTHY,
+                message="MAF workflow is initialized.",
+                critical=True,
+            )
+        )
+
+    def health(self):
+        """Return the current orchestrator/system health snapshot."""
+        return self.health_registry.snapshot()
+
+    def metrics(self):
+        """Return the current orchestrator metric snapshots."""
+        return self.metric_registry.snapshot()
+
+    def traces(self, trace_id: str | None = None):
+        """Return recorded orchestration traces, optionally filtered by trace id."""
+        return self.trace_recorder.spans(trace_id)
+
+    def audit_events(self, *, correlation_id: str | None = None, trace_id: str | None = None):
+        """Return recorded orchestration audit events."""
+        return self.audit_recorder.events(correlation_id=correlation_id, trace_id=trace_id)
 
     def register_agent(self, agent: Agent) -> None:
         """Register an agent and initialize its lifecycle state."""
@@ -329,23 +408,119 @@ class JarvisOrchestrator:
         return message
 
     async def run(self, request: OrchestrationRequest) -> str:
-        """Resolve control, agent and model, inject memory context, then execute through MAF."""
-        self._enforce_control(request)
-        agent = self.resolve_agent(request)
-        context = self.build_memory_context(request)
-        resolved_model = self.resolve_model(request, agent)
-        result = await self.workflow.run(
-            ResolvedAgentRequest(
-                request=request,
-                agent=agent,
-                context=context,
-                resolved_model=resolved_model,
+        """Resolve control, agent and model, inject memory context, execute through MAF, and observe the operation."""
+        started = datetime.now(timezone.utc)
+        trace_context = TraceContext.new(trace_id=request.trace_id)
+        correlation_id = request.correlation_id or trace_context.trace_id
+        self.metric_registry.increment("jarvis.orchestrator.requests")
+        self.audit_recorder.record(
+            AuditEvent.new(
+                AuditEventType.REQUESTED,
+                "orchestrate",
+                "orchestrator",
+                agent_id=request.agent_id,
+                task_id=request.task_id,
+                correlation_id=correlation_id,
+                trace_id=trace_context.trace_id,
             )
         )
-        outputs = result.get_outputs()
-        if not outputs:
-            raise RuntimeError("Le workflow M.A.F. n'a produit aucune sortie.")
-        return str(outputs[-1])
+        self.logger.log(
+            LogLevel.INFO,
+            "Orchestration request started",
+            event="orchestration.started",
+            correlation_id=correlation_id,
+            agent_id=request.agent_id,
+            task_id=request.task_id,
+        )
+        try:
+            self._enforce_control(request)
+            agent = self.resolve_agent(request)
+            context = self.build_memory_context(request)
+            resolved_model = self.resolve_model(request, agent)
+            response = await self.workflow.run(
+                ResolvedAgentRequest(
+                    request=request,
+                    agent=agent,
+                    context=context,
+                    resolved_model=resolved_model,
+                )
+            )
+            outputs = response.get_outputs()
+            if not outputs:
+                raise RuntimeError("Le workflow M.A.F. n'a produit aucune sortie.")
+            result = str(outputs[-1])
+            self.metric_registry.increment("jarvis.orchestrator.successes")
+            self.audit_recorder.record(
+                AuditEvent.new(
+                    AuditEventType.COMPLETED,
+                    "orchestrate",
+                    "orchestrator",
+                    agent_id=agent.id,
+                    task_id=request.task_id,
+                    correlation_id=correlation_id,
+                    trace_id=trace_context.trace_id,
+                    outcome="success",
+                )
+            )
+            self.logger.log(
+                LogLevel.INFO,
+                "Orchestration request completed",
+                event="orchestration.completed",
+                correlation_id=correlation_id,
+                agent_id=agent.id,
+                task_id=request.task_id,
+            )
+            return result
+        except Exception as exc:
+            self.metric_registry.increment("jarvis.orchestrator.failures")
+            self.audit_recorder.record(
+                AuditEvent.new(
+                    AuditEventType.FAILED,
+                    "orchestrate",
+                    "orchestrator",
+                    agent_id=request.agent_id,
+                    task_id=request.task_id,
+                    correlation_id=correlation_id,
+                    trace_id=trace_context.trace_id,
+                    outcome="failure",
+                    reason=str(exc),
+                )
+            )
+            self.logger.log(
+                LogLevel.ERROR,
+                "Orchestration request failed",
+                event="orchestration.failed",
+                correlation_id=correlation_id,
+                agent_id=request.agent_id,
+                task_id=request.task_id,
+                metadata={"error_type": type(exc).__name__, "error": str(exc)},
+            )
+            raise
+        finally:
+            ended = datetime.now(timezone.utc)
+            duration = (ended - started).total_seconds()
+            self.metric_registry.observe(
+                "jarvis.orchestrator.duration_seconds",
+                duration,
+            )
+            status = TraceStatus.ERROR if self.metric_registry.snapshot("jarvis.orchestrator.failures") and False else TraceStatus.OK
+            # The trace status is corrected below from the recorded audit outcome.
+            failed = any(
+                event.trace_id == trace_context.trace_id and event.event_type is AuditEventType.FAILED
+                for event in self.audit_recorder.events(trace_id=trace_context.trace_id)
+            )
+            status = TraceStatus.ERROR if failed else TraceStatus.OK
+            self.trace_recorder.record(
+                TraceSpan(
+                    context=trace_context,
+                    operation="orchestrate",
+                    component="orchestrator",
+                    started_at=started,
+                    ended_at=ended,
+                    status=status,
+                    attributes={"correlation_id": correlation_id},
+                )
+            )
 
 
 __all__ = [
