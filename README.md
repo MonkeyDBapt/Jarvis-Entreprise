@@ -17,7 +17,9 @@ JARVIS Enterprise
        │
        ├── Communication → Router → Security → Delivery / Transport
        │
-       └── Permissions → Authorization → Autonomy → Control / Supervision
+       ├── Permissions → Authorization → Autonomy → Control / Supervision
+       │
+       └── Verification → VerificationReport → VerificationCheck
        │
        ▼
 JarvisOrchestrator
@@ -77,41 +79,6 @@ Secrets and provider credentials are never committed to Git.
 
 The communication layer is transport-independent. Messages and events use explicit contracts; routing selects direct/message/event paths; channel transports remain behind transport contracts; `SecurityController` authorizes communication before delivery; and `JarvisOrchestrator.run_and_reply()` integrates responses without bypassing these boundaries.
 
-The consolidated architecture is:
-
-```text
-OrchestrationRequest
-       │
-       ▼
-JarvisOrchestrator
-       │
-       ├── Organization / Agents
-       ├── Capabilities / Security
-       ├── Memory
-       ├── Intelligence
-       ├── Permissions / Autonomy / Control
-       │
-       ▼
-Microsoft Agent Framework
-       │
-       ▼
-AgentRuntime / Hermes
-       │
-       ▼
-response
-       │
-       ▼
-CommunicationRouter
-       │
-       ├── SecurityController
-       └── Message/Event Delivery
-                    │
-                    ▼
-             Channel / Transport
-```
-
-The detailed consolidation record is available in [`docs/phase-7-8-validation-consolidation.md`](docs/phase-7-8-validation-consolidation.md).
-
 ## Phase 8 — Permissions / autonomie
 
 **Clôturée / consolidée.**
@@ -129,47 +96,21 @@ The detailed consolidation record is available in [`docs/phase-7-8-validation-co
 
 The permission and autonomy layer remains distinct from capabilities. `AuthorizationEvaluator` decides whether an action is authorized; `ControlEvaluator` combines authorization and autonomy; `SupervisionEvaluator` applies control policies; and `JarvisOrchestrator` enforces these decisions before entering the MAF workflow.
 
-The consolidated control path is:
+## Phase 9 — Vérification / observabilité
 
-```text
-OrchestrationRequest
-       │
-       ▼
-AuthorizationEvaluator
-       │
-       ▼
-ControlEvaluator
-       │
-       ▼
-SupervisionEvaluator
-       │
-       ├── denied / restricted / revoked / expired / approval
-       │          → stop before execution
-       │
-       └── control allowed
-                  │
-                  ▼
-             JarvisOrchestrator
-                  │
-                  ▼
-         Microsoft Agent Framework
-                  │
-                  ▼
-              AgentRuntime
-                  │
-                  ▼
-          HermesAdapter → Hermes
-```
+### 9.1 — Modèle de vérification
 
-The detailed consolidation record is available in [`docs/phase-8-8-validation-consolidation.md`](docs/phase-8-8-validation-consolidation.md).
+**✅ Validée / consolidée.** The verification layer now has provider-independent contracts for `VerificationReport` and `VerificationCheck`, with explicit statuses, severities, expected/observed values, evidence and metadata. The model aggregates results without treating inconclusive or skipped checks as successful. See [`docs/phase-9-1-modele-verification.md`](docs/phase-9-1-modele-verification.md).
+
+Execution, evidence collection, persistence and advanced observability remain separate concerns for the following Phase 9 steps.
 
 ## Validation and CI
 
-The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13. The latest available validation run for the consolidated Phase 8 work completed successfully on all four versions.
+The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13.
 
 ```bash
 python -m pip install -e .
-python -m unittest discover -s tests -v
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 ## Scope boundaries
