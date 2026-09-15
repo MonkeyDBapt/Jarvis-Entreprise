@@ -17,6 +17,8 @@ JARVIS Enterprise
        │
        ├── Communication → Router → Security → Delivery / Transport
        │
+       └── Permissions → Authorization → Autonomy → Control / Supervision
+       │
        ▼
 JarvisOrchestrator
        │
@@ -87,6 +89,7 @@ JarvisOrchestrator
        ├── Capabilities / Security
        ├── Memory
        ├── Intelligence
+       ├── Permissions / Autonomy / Control
        │
        ▼
 Microsoft Agent Framework
@@ -111,9 +114,18 @@ The detailed consolidation record is available in [`docs/phase-7-8-validation-co
 
 ## Phase 8 — Permissions / autonomie
 
-**8.5 — Niveaux d’autonomie : ✅ Validée.**
+**8.6 — Contrôle / supervision : en cours de validation.**
 
-The autonomy layer defines ordered levels `NONE`, `ASSISTED`, `SUPERVISED`, `BOUNDED` and `DELEGATED`. Autonomy is separate from authorization: permissions determine whether an action is allowed, while autonomy determines whether human approval is required. No autonomy level can bypass a denied permission. See [`docs/phase-8-5-autonomy.md`](docs/phase-8-5-autonomy.md).
+| Étape | Statut |
+|---|---|
+| 8.1 — Modèle de permission | ✅ Validée |
+| 8.2 — Registre des permissions | ✅ Validée |
+| 8.3 — Attribution / périmètre | ✅ Validée |
+| 8.4 — Autorisation / décision | ✅ Validée |
+| 8.5 — Niveaux d’autonomie | ✅ Validée |
+| **8.6 — Contrôle / supervision** | **🟡 Implémentée — validation CI en cours** |
+
+The control layer combines authorization and autonomy without conflating them. `ControlEvaluator` produces deterministic outcomes: `DENIED`, `APPROVAL_REQUIRED`, `SUPERVISED` or `AUTONOMOUS`. A denied permission is always terminal, and missing autonomy fails closed to human approval. See [`docs/phase-8-6-controle-supervision.md`](docs/phase-8-6-controle-supervision.md).
 
 ## Validation and CI
 
@@ -123,8 +135,6 @@ The repository validates package installation and the complete unittest suite th
 python -m pip install -e .
 python -m unittest discover -s tests -v
 ```
-
-The consolidated validation workflows cover the Phase 8.5 implementation on all four supported Python versions.
 
 ## Scope boundaries
 
