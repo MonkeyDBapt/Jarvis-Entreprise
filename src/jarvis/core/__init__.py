@@ -4,6 +4,7 @@ from .agent_assignment import AgentAssignmentManager, AgentSelectionCriteria
 from .agent_lifecycle import AgentLifecycleManager, AgentLifecycleState
 from .agent_registry import AgentRegistry
 from .authorization import AuthorizationDecision, AuthorizationEvaluator, AuthorizationRequest
+from .autonomy import AutonomyEvaluator, AutonomyLevel, AutonomyPolicy
 from .capability import Capability
 from .capability_assignment import CapabilityAssignmentManager
 from .capability_execution import CapabilityExecutor, CapabilityHandler
@@ -29,6 +30,9 @@ __all__ = [
     "AuthorizationDecision",
     "AuthorizationEvaluator",
     "AuthorizationRequest",
+    "AutonomyEvaluator",
+    "AutonomyLevel",
+    "AutonomyPolicy",
     "Capability",
     "CapabilityAssignmentManager",
     "CapabilityExecutor",
