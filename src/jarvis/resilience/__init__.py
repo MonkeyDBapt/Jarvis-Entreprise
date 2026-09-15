@@ -7,6 +7,12 @@ from .containment import (
     ContainmentManager,
     ContainmentScope,
 )
+from .degradation import (
+    DegradationAction,
+    DegradationDecision,
+    DegradationLevel,
+    DegradationManager,
+)
 from .detection import AnomalyDetector, AnomalyObservation
 from .errors import ErrorAction, ErrorHandlingDecision, ErrorManager, ErrorRecord
 from .recovery import RecoveryAction, RecoveryDecision, RecoveryManager, RetryPolicy
@@ -22,6 +28,10 @@ __all__ = [
     "ContainmentDecision",
     "ContainmentManager",
     "ContainmentScope",
+    "DegradationAction",
+    "DegradationDecision",
+    "DegradationLevel",
+    "DegradationManager",
     "ErrorAction",
     "ErrorHandlingDecision",
     "ErrorManager",
