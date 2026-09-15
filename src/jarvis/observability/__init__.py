@@ -1,5 +1,6 @@
 """Observability contracts for JARVIS Enterprise."""
 
+from .health import HealthCheck, HealthCheckResult, HealthRegistry, HealthStatus, SystemHealth
 from .logging import (
     LogEntry,
     LogLevel,
@@ -15,6 +16,11 @@ from .metrics import (
 from .tracing import TraceContext, TraceRecorder, TraceSpan, TraceStatus
 
 __all__ = [
+    "HealthCheck",
+    "HealthCheckResult",
+    "HealthRegistry",
+    "HealthStatus",
+    "SystemHealth",
     "LogEntry",
     "LogLevel",
     "StructuredLogger",
