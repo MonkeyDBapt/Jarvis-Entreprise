@@ -24,6 +24,7 @@ class OrchestratorObservabilityTests(unittest.TestCase):
     def test_run_is_observable_end_to_end(self) -> None:
         orchestrator = JarvisOrchestrator(runtime=FakeRuntime())
         orchestrator.register_agent(Agent("agent-1", "Agent 1"))
+        orchestrator.lifecycle.activate("agent-1")
 
         result = asyncio.run(
             orchestrator.run(
