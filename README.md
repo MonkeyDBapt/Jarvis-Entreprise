@@ -250,11 +250,19 @@ Provider-specific execution, credentials, dynamic availability/cost/latency eval
 |---|---|
 | 7.1 — Modèle de communication | ✅ Validée |
 | 7.2 — Messages | ✅ Validée |
-| **7.3 — Événements** | **✅ Validée** |
+| 7.3 — Événements | ✅ Validée |
+| 7.4 — Routage | ✅ Validée |
+| 7.5 — Canaux / transport | ✅ Validée |
+| 7.6 — Contrôle / sécurité | ✅ Validée |
+| **7.7 — Intégration orchestrateur** | **✅ Validée** |
 
 Phase 7.3 adds the transport-independent `EventDelivery` contract and the deterministic `InMemoryEventDelivery` baseline. Components can subscribe to event types, unsubscribe, and publish `CommunicationEvent` instances without depending on a concrete broker or transport. Delivery is synchronous and ordered by subscription registration. Duplicate subscriptions are rejected and publishing an event with no subscribers is a no-op.
 
-The event boundary is intentionally limited at this stage: persistence, replay, durable delivery, retries/dead-letter handling, distributed brokers, wildcard routing, and specialized observability remain outside 7.3. The detailed record is available in [`docs/phase-7-3-evenements.md`](docs/phase-7-3-evenements.md).
+Phase 7.4 adds the transport-independent `CommunicationRouter`, which selects direct, message, or event paths without exposing concrete transport implementations to callers. Phase 7.5 connects logical message/event channels to transport contracts while preserving the routing boundary. Phase 7.6 enforces the communication security boundary through `SecurityController` before direct/message delivery or event publication.
+
+Phase 7.7 integrates this communication boundary with `JarvisOrchestrator`. The optional `CommunicationRouter` is injected into the orchestrator, and `run_and_reply()` executes the normal orchestration path before creating and routing a response `CommunicationMessage`. Correlation, session, and task identifiers are preserved, while authorization and transport remain delegated to the established communication layer. The historical `run()` path remains unchanged when communication integration is not configured.
+
+The detailed Phase 7.7 record is available in [`docs/phase-7-7-integration-orchestrateur.md`](docs/phase-7-7-integration-orchestrateur.md).
 
 ## Tests
 
