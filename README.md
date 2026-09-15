@@ -104,29 +104,20 @@ The permission and autonomy layer remains distinct from capabilities. `Authoriza
 
 ## Phase 9 — Vérification / observabilité
 
-### 9.1 — Modèle de vérification
+**Clôturée / consolidée.**
 
-**✅ Validée / consolidée.** The verification layer now has provider-independent contracts for `VerificationReport` and `VerificationCheck`, with explicit statuses, severities, expected/observed values, evidence and metadata. The model aggregates results without treating inconclusive or skipped checks as successful. See [`docs/phase-9-1-modele-verification.md`](docs/phase-9-1-modele-verification.md).
+| Étape | Domaine | Statut |
+|---|---|---|
+| 9.1 | Modèle de vérification | ✅ Validée |
+| 9.2 | Journalisation / logs | ✅ Validée |
+| 9.3 | Métriques / indicateurs | ✅ Validée |
+| 9.4 | Traces / traçabilité | ✅ Validée |
+| 9.5 | État / santé système | ✅ Validée |
+| 9.6 | Audit / événements observables | ✅ Validée |
+| 9.7 | Intégration orchestrateur | ✅ Validée |
+| **9.8** | **Validation / consolidation** | **✅ Validée** |
 
-### 9.2 — Journalisation / logs
-
-**✅ Validée / consolidée.** JARVIS now exposes provider-independent structured logging through `StructuredLogger` and `LogEntry`, with UTC timestamps, explicit severity, component/event context, correlation identifiers and redaction of common credential fields. The implementation uses Python's standard `logging` backend and keeps persistence, metrics, tracing and external log shipping outside this step. See [`docs/phase-9-2-journalisation-logs.md`](docs/phase-9-2-journalisation-logs.md).
-
-### 9.3 — Métriques / indicateurs
-
-**✅ Validée / consolidée.** JARVIS now exposes provider-independent metric contracts through `MetricDefinition`, `MetricRegistry` and `MetricSnapshot`, supporting counters, gauges and histograms with deterministic labels and thread-safe local aggregation. See [`docs/phase-9-3-metriques-indicateurs.md`](docs/phase-9-3-metriques-indicateurs.md).
-
-### 9.4 — Traces / traçabilité
-
-**✅ Validée / consolidée.** JARVIS now exposes provider-independent traceability contracts through `TraceContext`, `TraceSpan` and `TraceRecorder`, providing stable trace identity, parent/child causal relationships, operation timing, status, attributes and events without imposing a tracing backend. See [`docs/phase-9-4-traces-tracabilite.md`](docs/phase-9-4-traces-tracabilite.md).
-
-### 9.5 — État / santé système
-
-**✅ Validée / consolidée.** JARVIS now exposes provider-independent system health contracts through `HealthCheck`, `HealthCheckResult`, `HealthRegistry` and `SystemHealth`. Health states are normalized as `healthy`, `degraded`, `unhealthy` and `unknown`; critical failures make the aggregate state unhealthy, while non-critical failures or unknown observations degrade the aggregate state. See [`docs/phase-9-5-etat-sante-systeme.md`](docs/phase-9-5-etat-sante-systeme.md).
-
-### 9.6 — Audit / événements observables
-
-**✅ Validée / consolidée.** JARVIS now exposes provider-independent audit contracts through `AuditEvent`, `AuditEventType` and `AuditRecorder`. Audit events capture stable identity, UTC time, action/component context, optional actor/agent/task identifiers, correlation and trace identifiers, outcome/reason and structured metadata. The recorder supports deterministic filtering by event type, correlation and trace without imposing persistence or an external audit backend. See [`docs/phase-9-6-audit-evenements-observables.md`](docs/phase-9-6-audit-evenements-observables.md).
+The verification and observability layer is provider-independent. It exposes verification reports, structured logs, metrics, causal traces, health state and audit events, and integrates them into `JarvisOrchestrator` without imposing external observability infrastructure. See [`docs/phase-9-8-validation-consolidation.md`](docs/phase-9-8-validation-consolidation.md).
 
 ## Validation and CI
 
