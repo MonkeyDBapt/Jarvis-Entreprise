@@ -12,6 +12,7 @@ from .metrics import (
     MetricRegistry,
     MetricSnapshot,
 )
+from .tracing import TraceContext, TraceRecorder, TraceSpan, TraceStatus
 
 __all__ = [
     "LogEntry",
@@ -22,4 +23,8 @@ __all__ = [
     "MetricKind",
     "MetricRegistry",
     "MetricSnapshot",
+    "TraceContext",
+    "TraceRecorder",
+    "TraceSpan",
+    "TraceStatus",
 ]
