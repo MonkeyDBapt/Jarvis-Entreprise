@@ -1,6 +1,6 @@
 # Phase 10.3 — Gestion des erreurs
 
-**Statut : validation technique en attente de la CI finale.**
+**Statut : validée.**
 
 ## Objectif
 
@@ -54,7 +54,7 @@ Cette politique est déterministe et remplaçable. Les mécanismes avancés de r
 - décision déterministe par sévérité ;
 - rejet des timestamps naïfs.
 
-La CI doit valider l'installation et l'ensemble de la suite sur Python 3.10 à 3.13.
+La validation GitHub Actions a été exécutée sur Python 3.10, 3.11, 3.12 et 3.13 : **les quatre jobs sont `success`**.
 
 ## Conclusion
 
