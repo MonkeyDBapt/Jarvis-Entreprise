@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Mapping
 from uuid import uuid4
@@ -21,8 +21,8 @@ class AnomalyObservation:
     severity: AnomalySeverity = AnomalySeverity.MEDIUM
     detected_at: datetime | None = None
     correlation_id: str | None = None
-    context: Mapping[str, object] = None  # type: ignore[assignment]
-    evidence: Mapping[str, object] = None  # type: ignore[assignment]
+    context: Mapping[str, object] = field(default_factory=dict)
+    evidence: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not self.source.strip() or not self.component.strip() or not self.message.strip():
@@ -51,8 +51,8 @@ class AnomalyDetector:
             message=observation.message,
             detected_at=detected_at,
             correlation_id=observation.correlation_id,
-            context=dict(observation.context or {}),
-            evidence=dict(observation.evidence or {}),
+            context=dict(observation.context),
+            evidence=dict(observation.evidence),
         )
 
     @staticmethod
