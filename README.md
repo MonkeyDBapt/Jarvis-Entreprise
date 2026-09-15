@@ -114,7 +114,7 @@ The detailed consolidation record is available in [`docs/phase-7-8-validation-co
 
 ## Phase 8 — Permissions / autonomie
 
-**8.6 — Contrôle / supervision : ✅ Validée.**
+**Clôturée / consolidée.**
 
 | Étape | Statut |
 |---|---|
@@ -123,13 +123,49 @@ The detailed consolidation record is available in [`docs/phase-7-8-validation-co
 | 8.3 — Attribution / périmètre | ✅ Validée |
 | 8.4 — Autorisation / décision | ✅ Validée |
 | 8.5 — Niveaux d’autonomie | ✅ Validée |
-| **8.6 — Contrôle / supervision** | **✅ Validée** |
+| 8.6 — Contrôle / supervision | ✅ Validée |
+| 8.7 — Intégration orchestrateur | ✅ Validée |
+| **8.8 — Validation / consolidation** | **✅ Validée** |
 
-The control layer combines authorization and autonomy without conflating them. `ControlEvaluator` produces deterministic outcomes: `DENIED`, `APPROVAL_REQUIRED`, `SUPERVISED` or `AUTONOMOUS`. A denied permission is always terminal, and missing autonomy fails closed to human approval. See [`docs/phase-8-6-controle-supervision.md`](docs/phase-8-6-controle-supervision.md).
+The permission and autonomy layer remains distinct from capabilities. `AuthorizationEvaluator` decides whether an action is authorized; `ControlEvaluator` combines authorization and autonomy; `SupervisionEvaluator` applies control policies; and `JarvisOrchestrator` enforces these decisions before entering the MAF workflow.
+
+The consolidated control path is:
+
+```text
+OrchestrationRequest
+       │
+       ▼
+AuthorizationEvaluator
+       │
+       ▼
+ControlEvaluator
+       │
+       ▼
+SupervisionEvaluator
+       │
+       ├── denied / restricted / revoked / expired / approval
+       │          → stop before execution
+       │
+       └── control allowed
+                  │
+                  ▼
+             JarvisOrchestrator
+                  │
+                  ▼
+         Microsoft Agent Framework
+                  │
+                  ▼
+              AgentRuntime
+                  │
+                  ▼
+          HermesAdapter → Hermes
+```
+
+The detailed consolidation record is available in [`docs/phase-8-8-validation-consolidation.md`](docs/phase-8-8-validation-consolidation.md).
 
 ## Validation and CI
 
-The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13. The Phase 8.6 validation run completed successfully on all four versions.
+The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13. The latest available validation run for the consolidated Phase 8 work completed successfully on all four versions.
 
 ```bash
 python -m pip install -e .
