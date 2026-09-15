@@ -27,6 +27,8 @@ JARVIS Enterprise
        │                 → HealthRegistry → SystemHealth
        │                 → AuditEvent → AuditRecorder
        │
+       └── Resilience → Anomaly
+       │
        ▼
 JarvisOrchestrator
        │
@@ -119,13 +121,23 @@ The permission and autonomy layer remains distinct from capabilities. `Authoriza
 
 The verification and observability layer is provider-independent. It exposes verification reports, structured logs, metrics, causal traces, health state and audit events, and integrates them into `JarvisOrchestrator` without imposing external observability infrastructure. See [`docs/phase-9-8-validation-consolidation.md`](docs/phase-9-8-validation-consolidation.md).
 
+## Phase 10 — Anomalies / résilience
+
+**En cours.**
+
+| Étape | Domaine | Statut |
+|---|---|---|
+| **10.1** | **Modèle d’anomalie** | **✅ Validée** |
+
+The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection, remediation, recovery and persistence remain separate concerns for later Phase 10 steps. See [`docs/phase-10-1-anomaly-model.md`](docs/phase-10-1-anomaly-model.md).
+
 ## Validation and CI
 
 The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13.
 
 ```bash
 python -m pip install -e .
-python -m unittest discover -s tests -p "test_*.py" -v
+python -m unittest discover -s ./tests -p "test_*.py" -v
 ```
 
 ## Scope boundaries
