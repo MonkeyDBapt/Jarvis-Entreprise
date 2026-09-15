@@ -1,4 +1,4 @@
-"""Communication domain models, message delivery, and event delivery contracts."""
+"""Communication domain models, delivery contracts, and routing."""
 
 from .events import EventDelivery, EventDeliveryError, EventHandler, InMemoryEventDelivery
 from .messages import (
@@ -15,12 +15,21 @@ from .models import (
     EventKind,
     MessageKind,
 )
+from .routing import (
+    CommunicationRouter,
+    CommunicationRouterProtocol,
+    CommunicationRoutingError,
+    DirectHandler,
+)
 
 __all__ = [
     "ChannelKind",
     "CommunicationChannel",
     "CommunicationEvent",
     "CommunicationMessage",
+    "CommunicationRouter",
+    "CommunicationRouterProtocol",
+    "CommunicationRoutingError",
     "EventDelivery",
     "EventDeliveryError",
     "EventHandler",
@@ -31,4 +40,5 @@ __all__ = [
     "MessageDeliveryError",
     "MessageHandler",
     "MessageKind",
+    "DirectHandler",
 ]
