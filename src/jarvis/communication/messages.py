@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Protocol
 
@@ -29,12 +28,12 @@ class MessageDeliveryError(RuntimeError):
     """Raised when a message cannot be delivered."""
 
 
-class InMemoryMessageDelivery(ABC):
+class InMemoryMessageDelivery:
     """Deterministic local message delivery implementation.
 
-    This implementation is intentionally synchronous and transport-free. It provides
-    the Phase 7.2 executable baseline while leaving the delivery boundary replaceable
-    by a future broker or distributed transport.
+    The implementation is synchronous and transport-free. It provides the Phase 7.2
+    executable baseline while leaving the delivery boundary replaceable by a future
+    broker or distributed transport.
     """
 
     def __init__(self) -> None:
