@@ -45,6 +45,8 @@ Le workflow GitHub Actions `Validation` exécute l'installation du package et la
 
 Le dernier commit de validation avant consolidation est `dd85718dfeca26d3a7ed5659aeb5bf665270134c`, et son run CI `Validation #283` est terminé avec la conclusion `success`.
 
+Après la consolidation documentaire, le commit `e698d1ba539cc678859c56f8da79faacfce483c7` a lui-même été validé par le run CI `Validation #285`, également terminé avec la conclusion `success`. Les quatre jobs Python 3.10, 3.11, 3.12 et 3.13 sont en succès.
+
 ## Limites conservées
 
 La consolidation ne rajoute volontairement :
