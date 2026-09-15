@@ -132,7 +132,7 @@ The verification and observability layer is provider-independent. It exposes ver
 | **10.3** | **Gestion des erreurs** | **✅ Validée** |
 | **10.4** | **Isolation / containment** | **✅ Validée** |
 | **10.5** | **Retry / récupération** | **✅ Validée** |
-| **10.6** | **Dégradation contrôlée** | **⏳ En validation CI** |
+| **10.6** | **Dégradation contrôlée** | **⏳ Validation CI du commit documentaire** |
 
 The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection normalizes observations into that contract. Error management normalizes execution errors into deterministic handling decisions without performing side effects. Containment produces explicit, deterministic isolation decisions without directly mutating runtime state. Recovery provides bounded retry and recovery decisions without performing retries, sleeps, state restoration or persistence. Controlled degradation maps anomaly/recovery state to a bounded operational level without directly disabling capabilities, revoking permissions, stopping agents or mutating runtime state. See [`docs/phase-10-5-retry-recovery.md`](docs/phase-10-5-retry-recovery.md) and [`docs/phase-10-6-controlled-degradation.md`](docs/phase-10-6-controlled-degradation.md).
 
