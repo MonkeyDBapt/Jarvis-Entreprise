@@ -1,5 +1,6 @@
-"""Communication domain models and delivery contracts."""
+"""Communication domain models, message delivery, and event delivery contracts."""
 
+from .events import EventDelivery, EventDeliveryError, EventHandler, InMemoryEventDelivery
 from .messages import (
     InMemoryMessageDelivery,
     MessageDelivery,
@@ -20,7 +21,11 @@ __all__ = [
     "CommunicationChannel",
     "CommunicationEvent",
     "CommunicationMessage",
+    "EventDelivery",
+    "EventDeliveryError",
+    "EventHandler",
     "EventKind",
+    "InMemoryEventDelivery",
     "InMemoryMessageDelivery",
     "MessageDelivery",
     "MessageDeliveryError",
