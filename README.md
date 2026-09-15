@@ -114,7 +114,7 @@ The detailed consolidation record is available in [`docs/phase-7-8-validation-co
 
 ## Phase 8 — Permissions / autonomie
 
-**8.6 — Contrôle / supervision : en cours de validation.**
+**8.6 — Contrôle / supervision : ✅ Validée.**
 
 | Étape | Statut |
 |---|---|
@@ -123,13 +123,13 @@ The detailed consolidation record is available in [`docs/phase-7-8-validation-co
 | 8.3 — Attribution / périmètre | ✅ Validée |
 | 8.4 — Autorisation / décision | ✅ Validée |
 | 8.5 — Niveaux d’autonomie | ✅ Validée |
-| **8.6 — Contrôle / supervision** | **🟡 Implémentée — validation CI en cours** |
+| **8.6 — Contrôle / supervision** | **✅ Validée** |
 
 The control layer combines authorization and autonomy without conflating them. `ControlEvaluator` produces deterministic outcomes: `DENIED`, `APPROVAL_REQUIRED`, `SUPERVISED` or `AUTONOMOUS`. A denied permission is always terminal, and missing autonomy fails closed to human approval. See [`docs/phase-8-6-controle-supervision.md`](docs/phase-8-6-controle-supervision.md).
 
 ## Validation and CI
 
-The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13.
+The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13. The Phase 8.6 validation run completed successfully on all four versions.
 
 ```bash
 python -m pip install -e .
