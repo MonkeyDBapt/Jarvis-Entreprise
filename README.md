@@ -19,7 +19,9 @@ JARVIS Enterprise
        │
        ├── Permissions → Authorization → Autonomy → Control / Supervision
        │
-       └── Verification → VerificationReport → VerificationCheck
+       ├── Verification → VerificationReport → VerificationCheck
+       │
+       └── Observability → StructuredLogger → LogEntry
        │
        ▼
 JarvisOrchestrator
@@ -102,7 +104,9 @@ The permission and autonomy layer remains distinct from capabilities. `Authoriza
 
 **✅ Validée / consolidée.** The verification layer now has provider-independent contracts for `VerificationReport` and `VerificationCheck`, with explicit statuses, severities, expected/observed values, evidence and metadata. The model aggregates results without treating inconclusive or skipped checks as successful. See [`docs/phase-9-1-modele-verification.md`](docs/phase-9-1-modele-verification.md).
 
-Execution, evidence collection, persistence and advanced observability remain separate concerns for the following Phase 9 steps.
+### 9.2 — Journalisation / logs
+
+**✅ Validée / consolidée.** JARVIS now exposes provider-independent structured logging through `StructuredLogger` and `LogEntry`, with UTC timestamps, explicit severity, component/event context, correlation identifiers and redaction of common credential fields. The implementation uses Python's standard `logging` backend and keeps persistence, metrics, tracing and external log shipping outside this step. See [`docs/phase-9-2-journalisation-logs.md`](docs/phase-9-2-journalisation-logs.md).
 
 ## Validation and CI
 
