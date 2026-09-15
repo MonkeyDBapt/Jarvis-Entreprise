@@ -3,6 +3,7 @@
 from .agent_assignment import AgentAssignmentManager, AgentSelectionCriteria
 from .agent_lifecycle import AgentLifecycleManager, AgentLifecycleState
 from .agent_registry import AgentRegistry
+from .authorization import AuthorizationDecision, AuthorizationEvaluator, AuthorizationRequest
 from .capability import Capability
 from .capability_assignment import CapabilityAssignmentManager
 from .capability_execution import CapabilityExecutor, CapabilityHandler
@@ -25,6 +26,9 @@ __all__ = [
     "AgentLifecycleState",
     "AgentRegistry",
     "AgentSelectionCriteria",
+    "AuthorizationDecision",
+    "AuthorizationEvaluator",
+    "AuthorizationRequest",
     "Capability",
     "CapabilityAssignmentManager",
     "CapabilityExecutor",
