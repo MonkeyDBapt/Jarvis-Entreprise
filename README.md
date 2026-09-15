@@ -27,7 +27,7 @@ JARVIS Enterprise
        │                 → HealthRegistry → SystemHealth
        │                 → AuditEvent → AuditRecorder
        │
-       └── Resilience → Anomaly
+       └── Resilience → Anomaly → Detection → Error Management → Containment
        │
        ▼
 JarvisOrchestrator
@@ -128,8 +128,11 @@ The verification and observability layer is provider-independent. It exposes ver
 | Étape | Domaine | Statut |
 |---|---|---|
 | **10.1** | **Modèle d’anomalie** | **✅ Validée** |
+| **10.2** | **Détection / classification** | **✅ Validée** |
+| **10.3** | **Gestion des erreurs** | **✅ Validée** |
+| **10.4** | **Isolation / containment** | **✅ Validée** |
 
-The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection, remediation, recovery and persistence remain separate concerns for later Phase 10 steps. See [`docs/phase-10-1-anomaly-model.md`](docs/phase-10-1-anomaly-model.md).
+The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection normalizes observations into that contract. Error management normalizes execution errors into deterministic handling decisions without performing side effects. Containment now produces explicit, deterministic isolation decisions without directly mutating runtime state. Remediation, recovery, persistence, transport and full orchestrator integration remain separate concerns for later Phase 10 steps.
 
 ## Validation and CI
 
