@@ -22,6 +22,8 @@ JARVIS Enterprise
        ├── Verification → VerificationReport → VerificationCheck
        │
        └── Observability → StructuredLogger → LogEntry
+       │                 → MetricRegistry → MetricSnapshot
+       │                 → TraceContext → TraceSpan → TraceRecorder
        │
        ▼
 JarvisOrchestrator
@@ -107,6 +109,14 @@ The permission and autonomy layer remains distinct from capabilities. `Authoriza
 ### 9.2 — Journalisation / logs
 
 **✅ Validée / consolidée.** JARVIS now exposes provider-independent structured logging through `StructuredLogger` and `LogEntry`, with UTC timestamps, explicit severity, component/event context, correlation identifiers and redaction of common credential fields. The implementation uses Python's standard `logging` backend and keeps persistence, metrics, tracing and external log shipping outside this step. See [`docs/phase-9-2-journalisation-logs.md`](docs/phase-9-2-journalisation-logs.md).
+
+### 9.3 — Métriques / indicateurs
+
+**✅ Validée / consolidée.** JARVIS now exposes provider-independent metric contracts through `MetricDefinition`, `MetricRegistry` and `MetricSnapshot`, supporting counters, gauges and histograms with deterministic labels and thread-safe local aggregation. See [`docs/phase-9-3-metriques-indicateurs.md`](docs/phase-9-3-metriques-indicateurs.md).
+
+### 9.4 — Traces / traçabilité
+
+**✅ Validée / consolidée.** JARVIS now exposes provider-independent traceability contracts through `TraceContext`, `TraceSpan` and `TraceRecorder`, providing stable trace identity, parent/child causal relationships, operation timing, status, attributes and events without imposing a tracing backend. See [`docs/phase-9-4-traces-tracabilite.md`](docs/phase-9-4-traces-tracabilite.md).
 
 ## Validation and CI
 
