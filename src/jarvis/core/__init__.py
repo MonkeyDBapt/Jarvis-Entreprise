@@ -18,6 +18,7 @@ from .permission import Permission
 from .permission_assignment import PermissionAssignment, PermissionAssignmentRegistry
 from .permission_registry import PermissionRegistry
 from .security import SecurityController, SecurityControlledExecutor, SecurityRule
+from .supervision import SupervisionDecision, SupervisionEvaluator, SupervisionOutcome, SupervisionPolicy
 from .tool import Tool
 from .tool_registry import ToolRegistry
 
@@ -55,6 +56,10 @@ __all__ = [
     "SecurityController",
     "SecurityControlledExecutor",
     "SecurityRule",
+    "SupervisionDecision",
+    "SupervisionEvaluator",
+    "SupervisionOutcome",
+    "SupervisionPolicy",
     "Team",
     "Tool",
     "ToolRegistry",
