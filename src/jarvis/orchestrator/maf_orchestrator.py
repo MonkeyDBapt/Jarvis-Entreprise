@@ -19,11 +19,18 @@ from jarvis.core import (
     AgentLifecycleManager,
     AgentRegistry,
     AgentSelectionCriteria,
+    AuthorizationEvaluator,
+    AuthorizationRequest,
+    AutonomyPolicy,
     CapabilityAssignmentManager,
     CapabilityExecutor,
     CapabilityRegistry,
+    ControlDecision,
+    ControlEvaluator,
+    ControlOutcome,
     Organization,
     OrganizationManager,
+    PermissionAssignmentRegistry,
     SecurityController,
     SecurityControlledExecutor,
 )
@@ -53,6 +60,11 @@ class OrchestrationRequest:
     memory_limit: int = 5
     model_usage: ModelUsageRequest | None = None
     model_controls: ModelControlConstraints | None = None
+    subject_id: str | None = None
+    action: str | None = None
+    resource: str | None = None
+    authorization_scope: str | None = None
+    autonomy_policy: AutonomyPolicy | None = None
 
 
 @dataclass(frozen=True)
@@ -100,7 +112,7 @@ class HermesExecutor(Executor):
 
 
 class JarvisOrchestrator:
-    """JARVIS orchestration entry point for agents, intelligence, memory, capabilities and communication."""
+    """JARVIS orchestration entry point for agents, intelligence, memory, capabilities, communication and control."""
 
     def __init__(
         self,
@@ -118,6 +130,9 @@ class JarvisOrchestrator:
         model_registry: ModelRegistry | None = None,
         model_router: ModelRouter | None = None,
         communication_router: CommunicationRouter | None = None,
+        permission_registry: PermissionAssignmentRegistry | None = None,
+        authorization_evaluator: AuthorizationEvaluator | None = None,
+        control_evaluator: ControlEvaluator | None = None,
     ) -> None:
         self.registry = registry or AgentRegistry()
         self.organization = OrganizationManager(
@@ -147,6 +162,16 @@ class JarvisOrchestrator:
             raise ValueError("Un routeur de modèles nécessite un registre de modèles.")
 
         self.communication_router = communication_router
+        self.permission_registry = permission_registry
+        self.authorization_evaluator = authorization_evaluator or (
+            AuthorizationEvaluator(permission_registry)
+            if permission_registry is not None
+            else None
+        )
+        if self.authorization_evaluator is not None and self.permission_registry is None:
+            raise ValueError("Un évaluateur d'autorisation nécessite un registre de permissions.")
+        self.control_evaluator = control_evaluator or ControlEvaluator()
+
         self.hermes_executor = HermesExecutor(runtime)
         self.workflow = WorkflowBuilder(start_executor=self.hermes_executor).build()
 
@@ -182,6 +207,58 @@ class JarvisOrchestrator:
         selection = request.model_usage.to_selection_request()
         result = self.model_router.select(selection, request.model_controls)
         return result.model.model_id
+
+    def evaluate_control(
+        self,
+        *,
+        subject_id: str,
+        action: str,
+        resource: str,
+        scope: str,
+        autonomy_policy: AutonomyPolicy | None = None,
+    ) -> ControlDecision:
+        """Evaluate authorization and autonomy before an orchestrated execution."""
+        if self.authorization_evaluator is None:
+            raise RuntimeError("L'intégration des permissions n'est pas configurée.")
+
+        authorization = self.authorization_evaluator.evaluate(
+            AuthorizationRequest(
+                subject_id=subject_id,
+                action=action,
+                resource=resource,
+                scope=scope,
+            )
+        )
+        return self.control_evaluator.evaluate(authorization, autonomy_policy)
+
+    def _enforce_control(self, request: OrchestrationRequest) -> ControlDecision | None:
+        fields = (
+            request.subject_id,
+            request.action,
+            request.resource,
+            request.authorization_scope,
+        )
+        if all(value is None for value in fields):
+            return None
+        if any(value is None for value in fields):
+            raise ValueError(
+                "Une requête de contrôle doit fournir subject_id, action, resource et authorization_scope."
+            )
+
+        decision = self.evaluate_control(
+            subject_id=request.subject_id,
+            action=request.action,
+            resource=request.resource,
+            scope=request.authorization_scope,
+            autonomy_policy=request.autonomy_policy,
+        )
+        if decision.outcome is ControlOutcome.DENIED:
+            raise PermissionError(decision.authorization.reason)
+        if decision.requires_human_control:
+            raise PermissionError(
+                "L'exécution orchestrée nécessite une validation ou une supervision humaine."
+            )
+        return decision
 
     def register_capability_handler(self, capability_id: str, handler) -> None:
         """Register one concrete implementation at the capability boundary."""
@@ -252,7 +329,8 @@ class JarvisOrchestrator:
         return message
 
     async def run(self, request: OrchestrationRequest) -> str:
-        """Resolve agent and model, inject memory context, then execute through MAF."""
+        """Resolve control, agent and model, inject memory context, then execute through MAF."""
+        self._enforce_control(request)
         agent = self.resolve_agent(request)
         context = self.build_memory_context(request)
         resolved_model = self.resolve_model(request, agent)
