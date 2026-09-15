@@ -7,7 +7,12 @@ from dataclasses import dataclass
 
 from agent_framework import Executor, WorkflowBuilder, WorkflowContext, handler
 
-from jarvis.communication import ChannelKind, CommunicationMessage, CommunicationRouter
+from jarvis.communication import (
+    ChannelKind,
+    CommunicationMessage,
+    CommunicationRouter,
+    MessageKind,
+)
 from jarvis.core import (
     Agent,
     AgentAssignmentManager,
@@ -238,7 +243,7 @@ class JarvisOrchestrator:
             sender_id=sender_id,
             recipient_id=recipient_id,
             payload={"response": response},
-            kind="response",
+            kind=MessageKind.RESPONSE,
             correlation_id=correlation_id,
             session_id=request.session_id,
             task_id=request.task_id,
