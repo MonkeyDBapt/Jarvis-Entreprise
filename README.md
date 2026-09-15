@@ -109,6 +109,12 @@ CommunicationRouter
 
 The detailed consolidation record is available in [`docs/phase-7-8-validation-consolidation.md`](docs/phase-7-8-validation-consolidation.md).
 
+## Phase 8 — Permissions / autonomie
+
+**8.5 — Niveaux d’autonomie : ✅ Validée.**
+
+The autonomy layer defines ordered levels `NONE`, `ASSISTED`, `SUPERVISED`, `BOUNDED` and `DELEGATED`. Autonomy is separate from authorization: permissions determine whether an action is allowed, while autonomy determines whether human approval is required. No autonomy level can bypass a denied permission. See [`docs/phase-8-5-autonomy.md`](docs/phase-8-5-autonomy.md).
+
 ## Validation and CI
 
 The repository validates package installation and the complete unittest suite through GitHub Actions on Python 3.10, 3.11, 3.12 and 3.13.
@@ -118,7 +124,7 @@ python -m pip install -e .
 python -m unittest discover -s tests -v
 ```
 
-The latest validation run on the consolidated Phase 7.7 commit completed successfully on all four Python versions. Phase 7.8 documentation was then committed to `main`.
+The consolidated validation workflows cover the Phase 8.5 implementation on all four supported Python versions.
 
 ## Scope boundaries
 
