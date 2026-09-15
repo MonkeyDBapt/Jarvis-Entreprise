@@ -179,26 +179,68 @@ Phase 5.8 validates and consolidates the complete memory architecture. The memor
 
 ### Phase 6 status
 
-**Phase 6 — Modèles / intelligence : en cours.**
+**Phase 6 — Modèles / intelligence : clôturée / consolidée.**
 
 | Étape | Statut |
 |---|---|
 | 6.1 — Modèle d’intelligence | ✅ Validée |
-| 6.2 — Registre des modèles | ✅ **Validée** |
-| 6.3 — Configuration | ✅ **Validée** |
-| 6.4 — Sélection / routage | ✅ **Validée** |
-| 6.5 — Stratégies d’utilisation | ✅ **Validée** |
-| 6.6 — Contrôle / contraintes | ✅ **Validée** |
+| 6.2 — Registre des modèles | ✅ Validée |
+| 6.3 — Configuration | ✅ Validée |
+| 6.4 — Sélection / routage | ✅ Validée |
+| 6.5 — Stratégies d’utilisation | ✅ Validée |
+| 6.6 — Contrôle / contraintes | ✅ Validée |
+| 6.7 — Intégration / orchestration | ✅ Validée |
+| 6.8 — Validation / consolidation | ✅ **Validée** |
 
-Phase 6.1 defines the provider-independent declarative `Model`, `ModelType`, and `ModelCapability` contracts. Phase 6.2 adds `ModelRegistry`, which centrally registers models by stable identifier, rejects duplicates, supports lookup and removal, and exposes a deterministic immutable registration view. Phase 6.3 adds the immutable provider-neutral `ModelConfiguration` boundary for endpoints, parameters, context/output limits, operational limits, secret references, and provider-specific configuration. Secrets themselves are never stored in the model configuration or committed to Git.
+Phase 6 establishes a provider-independent intelligence layer. `Model`, `ModelType`, and `ModelCapability` define declarative model contracts. `ModelRegistry` centrally registers models by stable identifier, rejects duplicates, supports lookup/removal, and exposes a deterministic immutable registration view. `ModelConfiguration` provides the provider-neutral configuration boundary for endpoints, parameters, context/output limits, operational limits, secret references, and provider-specific configuration; secrets themselves are never stored in model configuration or committed to Git.
 
-Phase 6.4 adds the provider-neutral `ModelSelectionRequest`, `ModelSelectionResult`, and `ModelRouter` contracts. Selection is deterministic: an explicit model id takes precedence, then requested capabilities, model type, provider, and registration order as a stable tie-breaker. Routing performs no provider execution or secret resolution; those concerns remain outside this step.
+`ModelSelectionRequest`, `ModelSelectionResult`, and `ModelRouter` provide deterministic provider-neutral routing. An explicit model id takes precedence, followed by requested capabilities, model type, provider, and registration order as a stable tie-breaker. `ModelUsageStrategy` expresses high-level intent (`balanced`, `fast`, `quality`, `economical`, `reasoning`) and translates it into the existing selection contract without provider execution or secret resolution.
 
-Phase 6.5 adds provider-neutral model usage strategies. `ModelUsageStrategy` expresses high-level intent (`balanced`, `fast`, `quality`, `economical`, `reasoning`) and `ModelUsageRequest` translates that intent plus explicit constraints into the existing `ModelSelectionRequest` contract. Strategy resolution performs no provider execution, secret resolution, or runtime optimization.
+`ModelControlConstraints` forms the hard control boundary. It can restrict providers and model types and enforce declared maximum context, output, and temperature limits. `ModelRouter` applies these controls before accepting a model, including explicit model requests, and deterministically rejects incompatible requests. Live quotas, real prices, latency, availability lookup, credentials, and provider execution remain outside this layer.
 
-Phase 6.6 adds `ModelControlConstraints` as a hard, provider-neutral control boundary. Constraints can restrict providers and model types and enforce declared maximum context, output, and temperature limits. `ModelRouter` applies these controls before accepting a model, including explicit model requests, and deterministically rejects incompatible requests. No provider execution, secret resolution, live quota, price, latency, or availability lookup is introduced.
+Phase 6.7 integrates model routing into `JarvisOrchestrator` while preserving the existing execution boundaries. The consolidated architecture is:
 
-The detailed consolidation records are available in [`docs/phase-6-2-model-registry.md`](docs/phase-6-2-model-registry.md), [`docs/phase-6-3-configuration.md`](docs/phase-6-3-configuration.md), [`docs/phase-6-4-selection-routage.md`](docs/phase-6-4-selection-routage.md), [`docs/phase-6-5-strategies-utilisation.md`](docs/phase-6-5-strategies-utilisation.md), and [`docs/phase-6-6-controle-contraintes.md`](docs/phase-6-6-controle-contraintes.md).
+```text
+OrchestrationRequest
+  │
+  ├── Agent resolution / lifecycle
+  │
+  ├── ModelUsageRequest
+  │       │
+  │       ▼
+  │   ModelUsageStrategy
+  │       │
+  │       ▼
+  │   ModelSelectionRequest
+  │       │
+  │       ├──────────────► ModelControlConstraints
+  │       │
+  │       ▼
+  │   ModelRouter
+  │       │
+  │       ▼
+  │   ModelRegistry
+  │       │
+  │       ▼
+  │   Resolved model identifier
+  │
+  ▼
+Microsoft Agent Framework
+  │
+  ▼
+AgentRuntime
+  │
+  ▼
+HermesAdapter / runtime concret
+```
+
+The router transmits only the selected model identifier to the runtime. No direct `ModelRouter → provider` or `ModelRegistry → provider` path exists. The historical `model` execution path remains compatible when intelligence routing is not requested.
+
+Phase 6 validation covers default and reasoning strategies, explicit constraint preservation, registry/router selection, deterministic constraint filtering and rejection, selected-model transmission to the runtime, the historical path without intelligence routing, and inactive-agent rejection. GitHub Actions validates the package and test suite across Python 3.10, 3.11, 3.12, and 3.13. No real secret or credential is committed.
+
+The detailed Phase 6 consolidation record is available in [`docs/phase-6-8-validation-consolidation.md`](docs/phase-6-8-validation-consolidation.md), with detailed records for 6.2–6.6 in the corresponding `docs/phase-6-*` files.
+
+Provider-specific execution, credentials, dynamic availability/cost/latency evaluation, advanced fallbacks, and concrete provider integrations remain outside Phase 6 and are reserved for dedicated later phases.
 
 ## Tests
 
