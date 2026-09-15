@@ -2,6 +2,7 @@
 
 from .anomalies import Anomaly, AnomalySeverity, AnomalyStatus, AnomalyType
 from .detection import AnomalyDetector, AnomalyObservation
+from .errors import ErrorAction, ErrorHandlingDecision, ErrorManager, ErrorRecord
 
 __all__ = [
     "Anomaly",
@@ -10,4 +11,8 @@ __all__ = [
     "AnomalyType",
     "AnomalyDetector",
     "AnomalyObservation",
+    "ErrorAction",
+    "ErrorHandlingDecision",
+    "ErrorManager",
+    "ErrorRecord",
 ]
