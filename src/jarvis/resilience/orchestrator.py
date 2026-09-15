@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .anomalies import Anomaly, AnomalyDetector, AnomalySeverity, AnomalyType
+from .anomalies import Anomaly, AnomalySeverity, AnomalyType
 from .degradation import DegradationDecision, DegradationManager
-from .detection import AnomalyObservation
+from .detection import AnomalyDetector, AnomalyObservation
 from .errors import ErrorHandlingDecision, ErrorManager, ErrorRecord
 from .recovery import RecoveryDecision, RecoveryManager, RetryPolicy
 
@@ -43,6 +43,7 @@ class OrchestratorResilience:
         self.error_manager = error_manager or ErrorManager()
         self.recovery_manager = recovery_manager or RecoveryManager(RetryPolicy())
         self.degradation_manager = degradation_manager or DegradationManager()
+        self.last_report: OrchestrationResilienceReport | None = None
 
     def classify_failure(
         self,
@@ -94,7 +95,7 @@ class OrchestratorResilience:
         failure semantics. The report is stored on ``last_report`` for callers
         that need the deterministic Phase 10 decisions.
         """
-        self.last_report: OrchestrationResilienceReport | None = None
+        self.last_report = None
         try:
             return await orchestrator.run(request)
         except Exception as exc:
