@@ -27,7 +27,7 @@ JARVIS Enterprise
        │                 → HealthRegistry → SystemHealth
        │                 → AuditEvent → AuditRecorder
        │
-       └── Resilience → Anomaly → Detection → Error Management → Containment
+       └── Resilience → Anomaly → Detection → Error Management → Containment → Recovery
        │
        ▼
 JarvisOrchestrator
@@ -131,8 +131,9 @@ The verification and observability layer is provider-independent. It exposes ver
 | **10.2** | **Détection / classification** | **✅ Validée** |
 | **10.3** | **Gestion des erreurs** | **✅ Validée** |
 | **10.4** | **Isolation / containment** | **✅ Validée** |
+| **10.5** | **Retry / récupération** | **🟢 Implémentée — validation CI en cours** |
 
-The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection normalizes observations into that contract. Error management normalizes execution errors into deterministic handling decisions without performing side effects. Containment now produces explicit, deterministic isolation decisions without directly mutating runtime state. Remediation, recovery, persistence, transport and full orchestrator integration remain separate concerns for later Phase 10 steps.
+The anomaly contract is provider-independent and records anomaly identity, family, severity, source, component, detection time, lifecycle status, optional correlation, context and evidence. Detection normalizes observations into that contract. Error management normalizes execution errors into deterministic handling decisions without performing side effects. Containment produces explicit, deterministic isolation decisions without directly mutating runtime state. Recovery now adds bounded retry and recovery decisions without performing retries, sleeps, state restoration or persistence. See [`docs/phase-10-5-retry-recovery.md`](docs/phase-10-5-retry-recovery.md).
 
 ## Validation and CI
 
@@ -145,4 +146,4 @@ python -m unittest discover -s ./tests -p "test_*.py" -v
 
 ## Scope boundaries
 
-The project deliberately keeps external runtimes, providers, transports and infrastructure behind replaceable contracts. Distributed brokers, persistent messaging, retries, advanced observability, concrete provider execution and other infrastructure concerns remain available for later dedicated phases.
+The project deliberately keeps external runtimes, providers, transports and infrastructure behind replaceable contracts. Distributed brokers, persistent messaging, retries with concrete execution/backoff, advanced observability, concrete provider execution and other infrastructure concerns remain available for later dedicated phases.
