@@ -9,6 +9,7 @@ from .containment import (
 )
 from .detection import AnomalyDetector, AnomalyObservation
 from .errors import ErrorAction, ErrorHandlingDecision, ErrorManager, ErrorRecord
+from .recovery import RecoveryAction, RecoveryDecision, RecoveryManager, RetryPolicy
 
 __all__ = [
     "Anomaly",
@@ -25,4 +26,8 @@ __all__ = [
     "ErrorHandlingDecision",
     "ErrorManager",
     "ErrorRecord",
+    "RecoveryAction",
+    "RecoveryDecision",
+    "RecoveryManager",
+    "RetryPolicy",
 ]
