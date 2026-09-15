@@ -12,6 +12,7 @@ from .memory_types import MemoryKind
 from .organization import Agent, Organization, Pole, Team
 from .organization_manager import OrganizationManager
 from .permission import Permission
+from .permission_registry import PermissionRegistry
 from .security import SecurityController, SecurityControlledExecutor, SecurityRule
 from .tool import Tool
 from .tool_registry import ToolRegistry
@@ -34,6 +35,7 @@ __all__ = [
     "Organization",
     "OrganizationManager",
     "Permission",
+    "PermissionRegistry",
     "Pole",
     "SecurityController",
     "SecurityControlledExecutor",
