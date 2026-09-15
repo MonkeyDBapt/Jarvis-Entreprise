@@ -24,6 +24,7 @@ JARVIS Enterprise
        └── Observability → StructuredLogger → LogEntry
        │                 → MetricRegistry → MetricSnapshot
        │                 → TraceContext → TraceSpan → TraceRecorder
+       │                 → HealthRegistry → SystemHealth
        │
        ▼
 JarvisOrchestrator
@@ -117,6 +118,10 @@ The permission and autonomy layer remains distinct from capabilities. `Authoriza
 ### 9.4 — Traces / traçabilité
 
 **✅ Validée / consolidée.** JARVIS now exposes provider-independent traceability contracts through `TraceContext`, `TraceSpan` and `TraceRecorder`, providing stable trace identity, parent/child causal relationships, operation timing, status, attributes and events without imposing a tracing backend. See [`docs/phase-9-4-traces-tracabilite.md`](docs/phase-9-4-traces-tracabilite.md).
+
+### 9.5 — État / santé système
+
+**✅ Validée / consolidée.** JARVIS now exposes provider-independent system health contracts through `HealthCheck`, `HealthCheckResult`, `HealthRegistry` and `SystemHealth`. Health states are normalized as `healthy`, `degraded`, `unhealthy` and `unknown`; critical failures make the aggregate state unhealthy, while non-critical failures or unknown observations degrade the aggregate state. See [`docs/phase-9-5-etat-sante-systeme.md`](docs/phase-9-5-etat-sante-systeme.md).
 
 ## Validation and CI
 
