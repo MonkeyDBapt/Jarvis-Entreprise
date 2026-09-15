@@ -123,7 +123,7 @@ The verification and observability layer is provider-independent. It exposes ver
 
 ## Phase 10 — Anomalies / résilience
 
-**En cours.**
+**Clôturée / consolidée.**
 
 | Étape | Domaine | Statut |
 |---|---|---|
@@ -133,9 +133,10 @@ The verification and observability layer is provider-independent. It exposes ver
 | 10.4 | Isolation / containment | ✅ Validée |
 | 10.5 | Retry / récupération | ✅ Validée |
 | 10.6 | Dégradation contrôlée | ✅ Validée |
-| **10.7** | **Intégration orchestrateur** | **✅ Validée** |
+| 10.7 | Intégration orchestrateur | ✅ Validée |
+| **10.8** | **Validation / consolidation** | **✅ Validée** |
 
-The resilience layer is integrated at the orchestration boundary through `OrchestratorResilience`. Orchestration failures can be normalized through anomaly detection, error handling, bounded recovery and controlled degradation decisions while preserving the original exception semantics. The integration performs no automatic retry, sleep/backoff, shutdown, capability disabling, permission revocation or infrastructure mutation. See [`docs/phase-10-6-controlled-degradation.md`](docs/phase-10-6-controlled-degradation.md) and [`docs/phase-10-7-orchestrator-integration.md`](docs/phase-10-7-orchestrator-integration.md).
+The resilience layer is integrated at the orchestration boundary through `OrchestratorResilience`. Failures can be normalized through anomaly detection, error handling, bounded recovery and controlled degradation decisions while preserving original exception semantics. The integration does not perform implicit retry, sleep/backoff, shutdown, capability disabling, permission revocation or infrastructure mutation. See [`docs/phase-10-7-orchestrator-integration.md`](docs/phase-10-7-orchestrator-integration.md) and [`docs/phase-10-8-validation-consolidation.md`](docs/phase-10-8-validation-consolidation.md).
 
 ## Validation and CI
 
