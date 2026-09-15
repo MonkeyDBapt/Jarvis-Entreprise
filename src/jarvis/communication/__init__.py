@@ -1,5 +1,11 @@
-"""Communication domain models."""
+"""Communication domain models and delivery contracts."""
 
+from .messages import (
+    InMemoryMessageDelivery,
+    MessageDelivery,
+    MessageDeliveryError,
+    MessageHandler,
+)
 from .models import (
     ChannelKind,
     CommunicationChannel,
@@ -15,5 +21,9 @@ __all__ = [
     "CommunicationEvent",
     "CommunicationMessage",
     "EventKind",
+    "InMemoryMessageDelivery",
+    "MessageDelivery",
+    "MessageDeliveryError",
+    "MessageHandler",
     "MessageKind",
 ]
