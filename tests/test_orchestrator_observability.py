@@ -41,7 +41,7 @@ class OrchestratorObservabilityTests(unittest.TestCase):
         metrics = {snapshot.name: snapshot for snapshot in orchestrator.metrics()}
         self.assertEqual(metrics["jarvis.orchestrator.requests"].value, 1.0)
         self.assertEqual(metrics["jarvis.orchestrator.successes"].value, 1.0)
-        self.assertEqual(metrics["jarvis.orchestrator.failures"].value, 0.0)
+        self.assertNotIn("jarvis.orchestrator.failures", metrics)
         self.assertEqual(metrics["jarvis.orchestrator.duration_seconds"].count, 1)
 
         events = orchestrator.audit_events(correlation_id="corr-1")
