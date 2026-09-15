@@ -242,6 +242,20 @@ The detailed Phase 6 consolidation record is available in [`docs/phase-6-8-valid
 
 Provider-specific execution, credentials, dynamic availability/cost/latency evaluation, advanced fallbacks, and concrete provider integrations remain outside Phase 6 and are reserved for dedicated later phases.
 
+### Phase 7 status
+
+**Phase 7 — Communication : en cours.**
+
+| Étape | Statut |
+|---|---|
+| 7.1 — Modèle de communication | ✅ Validée |
+| 7.2 — Messages | ✅ Validée |
+| **7.3 — Événements** | **✅ Validée** |
+
+Phase 7.3 adds the transport-independent `EventDelivery` contract and the deterministic `InMemoryEventDelivery` baseline. Components can subscribe to event types, unsubscribe, and publish `CommunicationEvent` instances without depending on a concrete broker or transport. Delivery is synchronous and ordered by subscription registration. Duplicate subscriptions are rejected and publishing an event with no subscribers is a no-op.
+
+The event boundary is intentionally limited at this stage: persistence, replay, durable delivery, retries/dead-letter handling, distributed brokers, wildcard routing, and specialized observability remain outside 7.3. The detailed record is available in [`docs/phase-7-3-evenements.md`](docs/phase-7-3-evenements.md).
+
 ## Tests
 
 Run the local test suite with:
