@@ -19,7 +19,7 @@ Clôturer la Phase 10 après validation des étapes 10.1 à 10.7, en vérifiant 
 
 ## Validation finale
 
-Le dernier commit de `main` est `b3cdec6dc02e1d314ffe2603057f99766dc039fe` (`fix(phase-10.7): correct resilience detector import`). Le workflow GitHub Actions `Validation` associé est terminé avec la conclusion `success`.
+Le commit de consolidation courant de `main` est `462f4f4145949911125c759890ce0655bae8f568` (`docs(phase-10): mark Phase 10 as consolidated`). Le workflow GitHub Actions `Validation` associé est terminé avec la conclusion `success`.
 
 La suite de tests contient notamment `tests/test_anomaly_model.py`, `tests/test_anomaly_detection.py`, `tests/test_error_management.py`, `tests/test_containment.py`, `tests/test_recovery.py`, `tests/test_degradation.py` et `tests/test_orchestrator_resilience.py`.
 
