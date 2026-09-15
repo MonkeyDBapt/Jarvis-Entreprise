@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from agent_framework import Executor, WorkflowBuilder, WorkflowContext, handler
 
+from jarvis.communication import ChannelKind, CommunicationMessage, CommunicationRouter
 from jarvis.core import (
     Agent,
     AgentAssignmentManager,
@@ -94,7 +95,7 @@ class HermesExecutor(Executor):
 
 
 class JarvisOrchestrator:
-    """JARVIS orchestration entry point for agents, intelligence, memory and capabilities."""
+    """JARVIS orchestration entry point for agents, intelligence, memory, capabilities and communication."""
 
     def __init__(
         self,
@@ -111,6 +112,7 @@ class JarvisOrchestrator:
         memory_context_injector: MemoryContextInjector | None = None,
         model_registry: ModelRegistry | None = None,
         model_router: ModelRouter | None = None,
+        communication_router: CommunicationRouter | None = None,
     ) -> None:
         self.registry = registry or AgentRegistry()
         self.organization = OrganizationManager(
@@ -139,6 +141,7 @@ class JarvisOrchestrator:
         if self.model_router is not None and self.model_registry is None:
             raise ValueError("Un routeur de modèles nécessite un registre de modèles.")
 
+        self.communication_router = communication_router
         self.hermes_executor = HermesExecutor(runtime)
         self.workflow = WorkflowBuilder(start_executor=self.hermes_executor).build()
 
@@ -214,6 +217,34 @@ class JarvisOrchestrator:
             request.message,
             limit=request.memory_limit,
         ).text
+
+    def _require_communication_router(self) -> CommunicationRouter:
+        if self.communication_router is None:
+            raise RuntimeError("L'intégration communication n'est pas configurée.")
+        return self.communication_router
+
+    async def run_and_reply(
+        self,
+        request: OrchestrationRequest,
+        *,
+        sender_id: str,
+        recipient_id: str,
+        correlation_id: str | None = None,
+        channel: ChannelKind = ChannelKind.MESSAGE,
+    ) -> CommunicationMessage:
+        """Run an orchestration request and route its response through communication."""
+        response = await self.run(request)
+        message = CommunicationMessage(
+            sender_id=sender_id,
+            recipient_id=recipient_id,
+            payload={"response": response},
+            kind="response",
+            correlation_id=correlation_id,
+            session_id=request.session_id,
+            task_id=request.task_id,
+        )
+        self._require_communication_router().route_message(message, channel)
+        return message
 
     async def run(self, request: OrchestrationRequest) -> str:
         """Resolve agent and model, inject memory context, then execute through MAF."""
