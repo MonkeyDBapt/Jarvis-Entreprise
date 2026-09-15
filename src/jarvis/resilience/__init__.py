@@ -15,6 +15,7 @@ from .degradation import (
 )
 from .detection import AnomalyDetector, AnomalyObservation
 from .errors import ErrorAction, ErrorHandlingDecision, ErrorManager, ErrorRecord
+from .orchestrator import OrchestratorResilience, OrchestrationResilienceReport
 from .recovery import RecoveryAction, RecoveryDecision, RecoveryManager, RetryPolicy
 
 __all__ = [
@@ -36,6 +37,8 @@ __all__ = [
     "ErrorHandlingDecision",
     "ErrorManager",
     "ErrorRecord",
+    "OrchestratorResilience",
+    "OrchestrationResilienceReport",
     "RecoveryAction",
     "RecoveryDecision",
     "RecoveryManager",
