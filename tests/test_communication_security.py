@@ -46,6 +46,30 @@ class CommunicationSecurityTests(unittest.TestCase):
         self.assertEqual(received, [message])
         self.assertTrue(router.can_route_message(message))
 
+    def test_denies_direct_message_before_handler(self) -> None:
+        received: list[CommunicationMessage] = []
+        security = SecurityController()
+        router = CommunicationRouter(security_controller=security)
+        router.register_direct("agent-b", received.append)
+        message = CommunicationMessage(sender_id="agent-a", recipient_id="agent-b")
+
+        with self.assertRaises(PermissionError):
+            router.route_message(message, ChannelKind.DIRECT)
+
+        self.assertEqual(received, [])
+
+    def test_allows_authorized_direct_message(self) -> None:
+        received: list[CommunicationMessage] = []
+        security = SecurityController()
+        security.allow("agent-a", "send", "communication:agent-b")
+        router = CommunicationRouter(security_controller=security)
+        router.register_direct("agent-b", received.append)
+        message = CommunicationMessage(sender_id="agent-a", recipient_id="agent-b")
+
+        router.route_message(message, ChannelKind.DIRECT)
+
+        self.assertEqual(received, [message])
+
     def test_denies_event_before_publication(self) -> None:
         delivery = InMemoryEventDelivery()
         received: list[CommunicationEvent] = []
